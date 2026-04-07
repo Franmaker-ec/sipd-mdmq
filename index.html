@@ -197,6 +197,80 @@ tbody tr:last-child{border-bottom:none}
 .page.active{display:block}
 .tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:var(--azul-bg);color:var(--azul-medio)}
 .implementador-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+
+/* ===== ORGANIGRAMA BÚSQUEDA ===== */
+.org-box.org-match{background:#FEF3C7 !important;border-color:#F59E0B !important;color:#92400E !important;box-shadow:0 0 0 3px rgba(245,158,11,0.3),0 4px 16px rgba(245,158,11,0.25) !important;transform:translateY(-2px);animation:org-pulse 1.2s ease-in-out 3}
+.org-box.org-match span{color:#92400E !important}
+@keyframes org-pulse{0%,100%{box-shadow:0 0 0 3px rgba(245,158,11,0.3)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0.5)}}
+.org-box.org-dimmed{opacity:0.25;transition:opacity .3s}
+.org-box.org-ancestor{opacity:1 !important;border-color:var(--azul-claro) !important}
+.org-match-badge{display:inline-block;background:#F59E0B;color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:4px;vertical-align:middle}
+
+/* ===== MÓDULO TAREAS ===== */
+.tareas-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.tareas-toolbar input,.tareas-toolbar select{padding:9px 14px;border:2px solid var(--borde);border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;background:white}
+.tareas-toolbar input:focus,.tareas-toolbar select:focus{border-color:var(--azul-claro)}
+.tareas-toolbar input{flex:1;min-width:180px}
+.vista-btns{display:flex;gap:4px;background:var(--gris-claro);border-radius:10px;padding:4px}
+.vista-btn{padding:6px 14px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--gris);transition:all .2s}
+.vista-btn.active{background:white;color:var(--azul);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+
+/* Lista */
+.tarea-card{background:white;border:1px solid var(--borde);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:box-shadow .2s}
+.tarea-card:hover{box-shadow:var(--sombra)}
+.tarea-card.bloqueada{border-left:4px solid var(--rojo)}
+.tarea-header{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;cursor:pointer}
+.tarea-expand-btn{background:none;border:none;cursor:pointer;font-size:12px;color:var(--gris);padding:2px 4px;flex-shrink:0;margin-top:2px;transition:transform .2s}
+.tarea-expand-btn.open{transform:rotate(90deg)}
+.tarea-titulo{font-size:14px;font-weight:700;color:var(--azul);flex:1;line-height:1.4}
+.tarea-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:5px}
+.tarea-meta span{font-size:11px;color:var(--gris)}
+.tarea-acciones{display:flex;gap:6px;flex-shrink:0}
+.prio-critica{background:#FEE2E2;color:#B91C1C;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700}
+.prio-alta{background:#FFF0E0;color:#C85A00;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700}
+.prio-media{background:#EBF3FB;color:#2E5FA3;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700}
+.prio-baja{background:#F1F5F9;color:#64748B;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700}
+.est-pendiente{background:#FEE2E2;color:#B91C1C;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.est-proceso{background:#FFF0E0;color:#C85A00;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.est-completada{background:#E6F4EE;color:#0D6E4E;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.est-bloqueada{background:#FEE2E2;color:#B91C1C;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid #FECACA}
+
+/* Subtareas */
+.subtareas-wrap{padding:0 18px 12px 42px;border-top:1px solid var(--gris-claro)}
+.subtarea-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--gris-claro)}
+.subtarea-row:last-child{border-bottom:none}
+.sub-check{width:16px;height:16px;border-radius:4px;border:2px solid var(--borde);cursor:pointer;flex-shrink:0;appearance:none;background:white;position:relative;transition:all .2s}
+.sub-check:checked{background:var(--verde);border-color:var(--verde)}
+.sub-check:checked::after{content:'✓';position:absolute;top:-2px;left:1px;font-size:11px;color:white;font-weight:700}
+.sub-titulo{flex:1;font-size:12px;color:var(--texto)}
+.sub-titulo.done{text-decoration:line-through;color:var(--gris)}
+.add-subtarea{display:flex;gap:8px;margin-top:8px}
+.add-subtarea input{flex:1;padding:7px 12px;border:1px dashed var(--borde);border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none}
+.add-subtarea input:focus{border-color:var(--azul-claro);border-style:solid}
+.add-subtarea button{padding:7px 14px;background:var(--azul-bg);color:var(--azul-medio);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* Kanban */
+.kanban-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
+.kanban-col{background:var(--gris-claro);border-radius:14px;padding:14px}
+.kanban-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.kanban-col-head h4{font-size:13px;font-weight:700;color:var(--texto)}
+.kanban-count{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.kanban-card{background:white;border:1px solid var(--borde);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.kanban-card:hover{box-shadow:var(--sombra);transform:translateY(-1px)}
+.kanban-card .k-titulo{font-size:12px;font-weight:700;color:var(--azul);margin-bottom:6px;line-height:1.4}
+.kanban-card .k-sub{font-size:10px;color:var(--gris);margin-bottom:6px}
+.kanban-card .k-foot{display:flex;justify-content:space-between;align-items:center}
+.k-vence-ok{font-size:10px;color:var(--verde)}
+.k-vence-warn{font-size:10px;color:var(--naranja);font-weight:700}
+.k-vence-late{font-size:10px;color:var(--rojo);font-weight:700}
+.sub-progress{height:4px;background:var(--borde);border-radius:99px;margin-top:6px}
+.sub-progress-fill{height:100%;border-radius:99px;background:var(--azul-claro);transition:width .5s}
+
+/* Stats tareas en dashboard */
+.t-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.t-stat{background:white;border:1px solid var(--borde);border-radius:12px;padding:14px 16px;text-align:center}
+.t-stat .tv{font-size:26px;font-weight:700;color:var(--azul)}
+.t-stat .tl{font-size:11px;color:var(--gris);margin-top:2px}
 </style>
 </head>
 <body>
@@ -242,6 +316,7 @@ tbody tr:last-child{border-bottom:none}
         <button class="nav-item" onclick="showPage('empresas',this)"><span class="icon">🏢</span>Empresas Públicas</button>
         <button class="nav-item" onclick="showPage('sistemas',this)"><span class="icon">💻</span>Inventario Sistemas</button>
         <button class="nav-item" onclick="showPage('reuniones',this)"><span class="icon">📅</span>Reuniones</button>
+        <button class="nav-item" onclick="showPage('tareas',this)"><span class="icon">✅</span>Tareas</button>
       </div>
       <div class="nav-section">
         <div class="nav-section-label">Herramientas</div>
@@ -288,6 +363,22 @@ tbody tr:last-child{border-bottom:none}
 
       <!-- ORGANIGRAMA -->
       <div class="page" id="page-organigrama">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-body" style="padding:16px 24px">
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <div style="position:relative;flex:1;min-width:220px">
+                <input type="text" id="org-search" placeholder="🔍 Buscar dependencia, dirección o unidad..."
+                  style="width:100%;padding:10px 40px 10px 14px;border:2px solid var(--borde);border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s"
+                  oninput="buscarEnOrg()" onfocus="this.style.borderColor='var(--azul-claro)'" onblur="this.style.borderColor='var(--borde)'">
+                <button onclick="limpiarBusqOrg()" title="Limpiar búsqueda"
+                  style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--gris);display:none" id="org-search-clear">✕</button>
+              </div>
+              <div id="org-search-info" style="font-size:12px;color:var(--gris);white-space:nowrap;min-width:80px"></div>
+              <button class="btn btn-sm btn-secondary" onclick="expandirTodoOrg()" title="Expandir todo">⊞ Expandir todo</button>
+              <button class="btn btn-sm btn-secondary" onclick="colapsarTodoOrg()" title="Colapsar todo">⊟ Colapsar</button>
+            </div>
+          </div>
+        </div>
         <div class="card">
           <div class="card-header">
             <h4>🗂️ Organigrama Institucional MDMQ</h4>
@@ -359,6 +450,56 @@ tbody tr:last-child{border-bottom:none}
           <button class="btn btn-primary" onclick="openModalReu(null)">➕ Nueva Reunión</button>
         </div>
         <div id="reu-list"></div>
+      </div>
+
+      <!-- TAREAS -->
+      <div class="page" id="page-tareas">
+        <div class="tareas-toolbar">
+          <input type="text" id="tarea-search" placeholder="🔍 Buscar tarea o subtarea..." oninput="renderTareas()">
+          <select id="tarea-f-estado" onchange="renderTareas()">
+            <option value="">Todos los estados</option>
+            <option>Pendiente</option><option>En proceso</option><option>Completada</option><option>Bloqueada</option>
+          </select>
+          <select id="tarea-f-prio" onchange="renderTareas()">
+            <option value="">Todas las prioridades</option>
+            <option>Crítica</option><option>Alta</option><option>Media</option><option>Baja</option>
+          </select>
+          <select id="tarea-f-resp" onchange="renderTareas()">
+            <option value="">Todos los responsables</option>
+          </select>
+          <div class="vista-btns">
+            <button class="vista-btn active" id="vbtn-lista" onclick="switchVistaTareas('lista')">☰ Lista</button>
+            <button class="vista-btn" id="vbtn-kanban" onclick="switchVistaTareas('kanban')">⊞ Kanban</button>
+          </div>
+          <button class="btn btn-primary" onclick="openModalTarea(null)">➕ Nueva Tarea</button>
+        </div>
+        <!-- Estadísticas rápidas -->
+        <div class="t-stats" id="tareas-stats"></div>
+        <!-- Vista Lista -->
+        <div id="tareas-lista-view">
+          <div id="tareas-list"></div>
+        </div>
+        <!-- Vista Kanban -->
+        <div id="tareas-kanban-view" style="display:none">
+          <div class="kanban-wrap">
+            <div class="kanban-col">
+              <div class="kanban-col-head"><h4>🔴 Pendiente</h4><span class="kanban-count" style="background:#FEE2E2;color:#B91C1C" id="k-count-Pendiente">0</span></div>
+              <div id="kanban-Pendiente"></div>
+            </div>
+            <div class="kanban-col">
+              <div class="kanban-col-head"><h4>🟡 En proceso</h4><span class="kanban-count" style="background:#FFF0E0;color:#C85A00" id="k-count-En proceso">0</span></div>
+              <div id="kanban-En proceso"></div>
+            </div>
+            <div class="kanban-col">
+              <div class="kanban-col-head"><h4>✅ Completada</h4><span class="kanban-count" style="background:#E6F4EE;color:#0D6E4E" id="k-count-Completada">0</span></div>
+              <div id="kanban-Completada"></div>
+            </div>
+            <div class="kanban-col">
+              <div class="kanban-col-head"><h4>🚫 Bloqueada</h4><span class="kanban-count" style="background:#FEE2E2;color:#B91C1C" id="k-count-Bloqueada">0</span></div>
+              <div id="kanban-Bloqueada"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- DIAGNÓSTICO GAP -->
@@ -644,15 +785,86 @@ tbody tr:last-child{border-bottom:none}
   </div>
 </div>
 
+<!-- Modal Tarea -->
+<div class="modal-overlay" id="modal-tarea">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <h3 id="mtarea-title">Nueva Tarea</h3>
+      <button class="modal-close" onclick="closeModal('modal-tarea')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tarea-id">
+      <div class="section-divider">📋 Identificación</div>
+      <div class="field" style="margin-bottom:14px">
+        <label>Título de la tarea *</label>
+        <input type="text" id="t-titulo" placeholder="Ej: Nombramiento del DPD — gestionar firma del Alcalde">
+      </div>
+      <div class="form-row form-row-2">
+        <div class="field">
+          <label>Estado</label>
+          <select id="t-estado">
+            <option>Pendiente</option><option>En proceso</option><option>Completada</option><option>Bloqueada</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Prioridad</label>
+          <select id="t-prio">
+            <option>Alta</option><option>Crítica</option><option>Media</option><option>Baja</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="field">
+          <label>Responsable</label>
+          <select id="t-resp"><option value="">Sin asignar</option></select>
+        </div>
+        <div class="field">
+          <label>Fecha límite</label>
+          <input type="date" id="t-fecha">
+        </div>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="field">
+          <label>Dependencia vinculada</label>
+          <select id="t-dep"><option value="">Sin dependencia</option></select>
+        </div>
+        <div class="field">
+          <label>Componente SIPD (opcional)</label>
+          <select id="t-comp"><option value="">Sin componente</option></select>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:14px">
+        <label>Plazo legal (si aplica)</label>
+        <input type="text" id="t-plazo" placeholder="Ej: 15 días hábiles desde firma para registrar en SPDP">
+      </div>
+      <div class="field" style="margin-bottom:14px">
+        <label>Notas / Descripción</label>
+        <textarea id="t-notas" placeholder="Contexto, instrucciones o información adicional..."></textarea>
+      </div>
+      <div class="section-divider">📎 Subtareas</div>
+      <p style="font-size:12px;color:var(--gris);margin-bottom:12px">Divide la tarea en pasos más pequeños. Puedes marcarlos como completados desde la vista principal.</p>
+      <div id="modal-subtareas-list"></div>
+      <div class="add-subtarea">
+        <input type="text" id="nueva-subtarea-input" placeholder="Agregar subtarea..." onkeypress="if(event.key==='Enter')addSubtareaModal()">
+        <button onclick="addSubtareaModal()">+ Agregar</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-tarea')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTarea()">💾 Guardar Tarea</button>
+    </div>
+  </div>
+</div>
+
 <!-- FIREBASE -->
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,collection,getDocs,doc,setDoc,deleteDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,getDocs,doc,setDoc,deleteDoc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const cfg={apiKey:"AIzaSyCsyb7V4Bgee0uCXkVYl12VPP5bnqak_XI",authDomain:"implementacion-mdmq.firebaseapp.com",projectId:"implementacion-mdmq",storageBucket:"implementacion-mdmq.firebasestorage.app",messagingSenderId:"104720286448",appId:"1:104720286448:web:2ebc7be791593b82927835"};
 const app=initializeApp(cfg);const auth=getAuth(app);const db=getFirestore(app);
 window._auth=auth;window._db=db;window._signIn=signInWithEmailAndPassword;window._signOut=signOut;
-window._col=collection;window._getDocs=getDocs;window._doc=doc;window._set=setDoc;window._del=deleteDoc;
+window._col=collection;window._getDocs=getDocs;window._doc=doc;window._set=setDoc;window._del=deleteDoc;window._update=updateDoc;
 onAuthStateChanged(auth,u=>{
   if(u){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='flex';
   const n=u.email.split('@')[0];document.getElementById('user-name').textContent=u.email;document.getElementById('user-avatar').textContent=n[0].toUpperCase();initApp();}
@@ -696,6 +908,9 @@ const EP_COMP=[
 
 const STATUS=['Pendiente','En proceso','Completado','No aplica'];
 const SC={Completado:'verde','En proceso':'amarillo',Pendiente:'rojo','No aplica':'gris'};
+let tareas=[];
+let vistaTareas='lista';
+let modalSubtareas=[];
 
 // GAP normativa por componente
 const GAP_NORM={
@@ -757,12 +972,12 @@ window.doLogout=doLogout;
 async function initApp(){
   await loadAll();
   renderEquipo();renderDeps();renderEPs();renderSis();renderReuniones();
-  renderDashboard();renderOrg();renderGAPSelect();renderEntrevista();renderReportes();
+  renderDashboard();renderOrg();renderGAPSelect();renderEntrevista();renderReportes();renderTareas();
 }
 
 async function loadAll(){
   const load=async(col)=>{try{const s=await window._getDocs(window._col(window._db,col));return s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){console.error(e);return[];}};
-  [deps,eps,sistemas,reuniones,implementadores]=await Promise.all([load('dependencias'),load('empresas_publicas'),load('sistemas'),load('reuniones'),load('implementadores')]);
+  [deps,eps,sistemas,reuniones,implementadores,tareas]=await Promise.all([load('dependencias'),load('empresas_publicas'),load('sistemas'),load('reuniones'),load('implementadores'),load('tareas')]);
 }
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2);}
@@ -778,7 +993,7 @@ const PAGES={
   gap:['Diagnóstico GAP','Lista de verificación de brechas por dependencia'],
   entrevista:['Formulario de Entrevista','Guía para reuniones con puntos focales'],
   equipo:['Equipo Implementador','Gestión del equipo de implementación'],
-  reportes:['Reportes','Informes de cumplimiento y avance'],
+  tareas:['Tareas','Gestión de tareas y subtareas del SIPD'],
 };
 function showPage(p,el){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
@@ -791,6 +1006,7 @@ function showPage(p,el){
   document.getElementById('page-subtitle').textContent=t[1];
   if(p==='reportes')renderReportes();
   if(p==='gap')renderGAPSelect();
+  if(p==='tareas')renderTareas();
 }
 window.showPage=showPage;
 
@@ -1060,7 +1276,138 @@ function orgClick(nombre,isEP,id){
 }
 window.orgClick=orgClick;
 
-// ======== DEPENDENCIAS ========
+// ======== ORGANIGRAMA — BÚSQUEDA ========
+
+// Recolectar todos los nodos del DOM (org-box) junto con su texto
+function getAllOrgBoxes(){
+  return Array.from(document.querySelectorAll('#org-tree .org-box'));
+}
+
+// Subir desde un nodo hasta la raíz expandiendo todos los contenedores colapsados
+function expandAncestors(boxEl){
+  let el=boxEl.parentElement;
+  while(el&&el.id!=='org-tree'){
+    if(el.classList.contains('org-children')&&el.classList.contains('collapsed')){
+      el.classList.remove('collapsed');
+      // actualizar el botón de colapso del padre
+      const parentNode=el.previousElementSibling; // org-connector-v
+      const parentBox=parentNode?.previousElementSibling; // org-box
+      const colBtn=parentBox?.querySelector('.collapse-btn');
+      if(colBtn)colBtn.textContent='▼';
+    }
+    el=el.parentElement;
+  }
+}
+
+// Expandir TODO el árbol
+function expandirTodoOrg(){
+  document.querySelectorAll('#org-tree .org-children').forEach(el=>{
+    el.classList.remove('collapsed');
+  });
+  document.querySelectorAll('#org-tree .collapse-btn').forEach(b=>b.textContent='▼');
+}
+window.expandirTodoOrg=expandirTodoOrg;
+
+// Colapsar TODO el árbol (excepto nivel 0)
+function colapsarTodoOrg(){
+  limpiarBusqOrg();
+  // colapsar solo niveles 2 y 3 para dejar visible el primer nivel
+  document.querySelectorAll('#org-tree .org-children').forEach(el=>{
+    // contar profundidad
+    let depth=0,p=el.parentElement;
+    while(p&&p.id!=='org-tree'){if(p.classList.contains('org-children'))depth++;p=p.parentElement;}
+    if(depth>=0)el.classList.add('collapsed');
+  });
+  document.querySelectorAll('#org-tree .collapse-btn').forEach(b=>b.textContent='▶');
+}
+window.colapsarTodoOrg=colapsarTodoOrg;
+
+function limpiarBusqOrg(){
+  document.getElementById('org-search').value='';
+  document.getElementById('org-search-clear').style.display='none';
+  document.getElementById('org-search-info').textContent='';
+  // quitar todas las clases de búsqueda
+  getAllOrgBoxes().forEach(b=>{
+    b.classList.remove('org-match','org-dimmed','org-ancestor');
+    // quitar badge si existe
+    const badge=b.querySelector('.org-match-badge');
+    if(badge)badge.remove();
+  });
+}
+window.limpiarBusqOrg=limpiarBusqOrg;
+
+function buscarEnOrg(){
+  const q=(document.getElementById('org-search').value||'').trim().toLowerCase();
+  const clearBtn=document.getElementById('org-search-clear');
+  const infoEl=document.getElementById('org-search-info');
+
+  // sin query → limpiar
+  if(!q){limpiarBusqOrg();return;}
+  clearBtn.style.display='block';
+
+  // expandir todo primero para que todos los nodos sean visibles y localizables
+  expandirTodoOrg();
+
+  const allBoxes=getAllOrgBoxes();
+  const matches=[];
+  const ancestorBoxes=new Set();
+
+  // identificar matches y sus ancestros
+  allBoxes.forEach(box=>{
+    const texto=box.querySelector('span')?.textContent?.toLowerCase()||'';
+    box.classList.remove('org-match','org-dimmed','org-ancestor');
+    const badge=box.querySelector('.org-match-badge');
+    if(badge)badge.remove();
+
+    if(texto.includes(q)){
+      matches.push(box);
+      // marcar todos los ancestros org-box
+      let el=box.parentElement;
+      while(el&&el.id!=='org-tree'){
+        if(el.classList.contains('org-box')&&!matches.includes(el)){
+          ancestorBoxes.add(el);
+        }
+        el=el.parentElement;
+      }
+    }
+  });
+
+  // aplicar clases
+  allBoxes.forEach(box=>{
+    if(matches.includes(box)){
+      box.classList.add('org-match');
+      box.classList.remove('org-dimmed','org-ancestor');
+    } else if(ancestorBoxes.has(box)){
+      box.classList.add('org-ancestor');
+      box.classList.remove('org-dimmed','org-match');
+    } else {
+      box.classList.add('org-dimmed');
+      box.classList.remove('org-match','org-ancestor');
+    }
+  });
+
+  // info de resultados
+  if(matches.length===0){
+    infoEl.textContent='Sin resultados';
+    infoEl.style.color='var(--rojo)';
+  } else {
+    infoEl.textContent=`${matches.length} resultado${matches.length>1?'s':''}`;
+    infoEl.style.color='var(--verde)';
+    // scroll al primer resultado
+    setTimeout(()=>{
+      matches[0].scrollIntoView({behavior:'smooth',block:'center',inline:'center'});
+    },120);
+  }
+}
+window.buscarEnOrg=buscarEnOrg;
+
+// También activar búsqueda con Enter y limpiar con Escape
+document.addEventListener('keydown',function(e){
+  const inp=document.getElementById('org-search');
+  if(!inp||document.activeElement!==inp)return;
+  if(e.key==='Escape')limpiarBusqOrg();
+});
+
 function renderDeps(){
   // update implementador filter
   const sel=document.getElementById('dep-f-imp');
@@ -1770,8 +2117,347 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 window.closeModal=closeModal;
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
 
+// ======== MÓDULO TAREAS ========
+function switchVistaTareas(v){
+  vistaTareas=v;
+  document.getElementById('vbtn-lista').classList.toggle('active',v==='lista');
+  document.getElementById('vbtn-kanban').classList.toggle('active',v==='kanban');
+  document.getElementById('tareas-lista-view').style.display=v==='lista'?'block':'none';
+  document.getElementById('tareas-kanban-view').style.display=v==='kanban'?'block':'none';
+  renderTareas();
+}
+window.switchVistaTareas=switchVistaTareas;
+
+function filtrarTareas(){
+  const q=(document.getElementById('tarea-search').value||'').toLowerCase();
+  const fe=document.getElementById('tarea-f-estado').value;
+  const fp=document.getElementById('tarea-f-prio').value;
+  const fr=document.getElementById('tarea-f-resp').value;
+  return tareas.filter(t=>{
+    const matchQ=!q||t.titulo.toLowerCase().includes(q)||(t.notas||'').toLowerCase().includes(q)||
+      (t.subtareas||[]).some(s=>s.titulo.toLowerCase().includes(q));
+    return matchQ&&(!fe||t.estado===fe)&&(!fp||t.prio===fp)&&(!fr||t.resp===fr);
+  });
+}
+
+function venceColor(fecha){
+  if(!fecha)return'';
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const d=new Date(fecha+'T00:00:00');
+  const diff=Math.round((d-hoy)/(1000*60*60*24));
+  if(diff<0)return'k-vence-late';
+  if(diff<=3)return'k-vence-warn';
+  return'k-vence-ok';
+}
+function venceLabel(fecha){
+  if(!fecha)return'';
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const d=new Date(fecha+'T00:00:00');
+  const diff=Math.round((d-hoy)/(1000*60*60*24));
+  if(diff<0)return`⚠ Vencida hace ${Math.abs(diff)}d`;
+  if(diff===0)return'🔴 Vence hoy';
+  if(diff===1)return'⚠ Vence mañana';
+  return`📅 ${fecha}`;
+}
+function prioClass(p){
+  return{Crítica:'prio-critica',Alta:'prio-alta',Media:'prio-media',Baja:'prio-baja'}[p]||'prio-baja';
+}
+function estClass(e){
+  return{'Pendiente':'est-pendiente','En proceso':'est-proceso','Completada':'est-completada','Bloqueada':'est-bloqueada'}[e]||'est-pendiente';
+}
+function subProgress(t){
+  const subs=t.subtareas||[];
+  if(!subs.length)return'';
+  const done=subs.filter(s=>s.done).length;
+  const pct=Math.round(done/subs.length*100);
+  return`<div style="margin-top:6px;font-size:10px;color:var(--gris)">${done}/${subs.length} subtareas</div>
+    <div class="sub-progress"><div class="sub-progress-fill" style="width:${pct}%"></div></div>`;
+}
+
+function renderTareasStats(filtered){
+  const total=tareas.length;
+  const pend=tareas.filter(t=>t.estado==='Pendiente').length;
+  const proc=tareas.filter(t=>t.estado==='En proceso').length;
+  const comp=tareas.filter(t=>t.estado==='Completada').length;
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const venc=tareas.filter(t=>t.fecha&&new Date(t.fecha+'T00:00:00')<hoy&&t.estado!=='Completada').length;
+  document.getElementById('tareas-stats').innerHTML=`
+    <div class="t-stat"><div class="tv">${total}</div><div class="tl">Total tareas</div></div>
+    <div class="t-stat"><div class="tv" style="color:var(--naranja)">${proc}</div><div class="tl">En proceso</div></div>
+    <div class="t-stat"><div class="tv" style="color:var(--verde)">${comp}</div><div class="tl">Completadas</div></div>
+    <div class="t-stat"><div class="tv" style="color:${venc>0?'var(--rojo)':'var(--gris)'}">${venc}</div><div class="tl">Vencidas</div></div>`;
+}
+
+function renderTareas(){
+  // update filtro responsable
+  const selR=document.getElementById('tarea-f-resp');
+  const rv=selR.value;
+  selR.innerHTML='<option value="">Todos los responsables</option>'+
+    implementadores.filter(i=>i.activo!==false).map(i=>`<option value="${i.id}" ${i.id===rv?'selected':''}>${i.nombre}</option>`).join('');
+
+  const filtered=filtrarTareas();
+  renderTareasStats(filtered);
+
+  if(vistaTareas==='lista') renderTareasLista(filtered);
+  else renderTareasKanban(filtered);
+}
+window.renderTareas=renderTareas;
+
+function renderTareasLista(filtered){
+  const c=document.getElementById('tareas-list');
+  if(!filtered.length){
+    c.innerHTML='<div class="empty-state"><div class="icon">✅</div><h4>Sin tareas</h4><p>Crea la primera tarea con el botón "Nueva Tarea"</p></div>';return;
+  }
+  // Agrupar por prioridad
+  const orden=['Crítica','Alta','Media','Baja'];
+  let html='';
+  orden.forEach(prio=>{
+    const grupo=filtered.filter(t=>t.prio===prio);
+    if(!grupo.length)return;
+    html+=`<div style="font-size:11px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px">${prio==='Crítica'?'🔴':prio==='Alta'?'🟠':prio==='Media'?'🔵':'⚪'} ${prio}</div>`;
+    grupo.forEach(t=>{
+      const subs=t.subtareas||[];
+      const respNom=implementadores.find(i=>i.id===t.resp)?.nombre||'Sin asignar';
+      const depNom=deps.find(d=>d.id===t.dep)?.nombre||t.dep||'';
+      const compNom=COMPONENTES.find(c=>c.id===t.comp)?.n||'';
+      const tid='trow-'+t.id;
+      html+=`<div class="tarea-card ${t.estado==='Bloqueada'?'bloqueada':''}">
+        <div class="tarea-header" onclick="toggleTareaRow('${tid}')">
+          <button class="tarea-expand-btn" id="exp-${tid}">${subs.length>0?'▶':''}</button>
+          <div style="flex:1">
+            <div class="tarea-titulo">${t.id_num?'<span style="color:var(--gris);font-weight:400;font-size:12px">T-'+String(t.id_num).padStart(3,'0')+' · </span>':''}${t.titulo}</div>
+            <div class="tarea-meta">
+              <span class="${estClass(t.estado)}">${t.estado}</span>
+              <span>${respNom}</span>
+              ${depNom?`<span>🏛️ ${depNom.length>30?depNom.substr(0,30)+'…':depNom}</span>`:''}
+              ${compNom?`<span>📦 ${compNom}</span>`:''}
+              ${t.fecha?`<span class="${venceColor(t.fecha)}">${venceLabel(t.fecha)}</span>`:''}
+              ${t.plazo?`<span style="color:var(--rojo)">⚖️ ${t.plazo}</span>`:''}
+            </div>
+            ${subProgress(t)}
+          </div>
+          <div class="tarea-acciones" onclick="event.stopPropagation()">
+            <span class="${prioClass(t.prio)}">${t.prio}</span>
+            <button class="btn btn-sm btn-secondary" onclick="openModalTarea('${t.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteTarea('${t.id}')">🗑️</button>
+          </div>
+        </div>
+        ${subs.length>0?`<div class="subtareas-wrap" id="${tid}" style="display:none">
+          ${subs.map((s,si)=>`<div class="subtarea-row">
+            <input type="checkbox" class="sub-check" ${s.done?'checked':''} onchange="toggleSubtarea('${t.id}',${si},this.checked)">
+            <span class="sub-titulo ${s.done?'done':''}">${s.titulo}</span>
+            <button class="btn btn-sm" style="padding:2px 6px;font-size:11px;background:none;border:none;color:var(--rojo);cursor:pointer" onclick="deleteSubtarea('${t.id}',${si})">✕</button>
+          </div>`).join('')}
+          <div class="add-subtarea">
+            <input type="text" placeholder="Agregar subtarea..." id="inline-sub-${t.id}" onkeypress="if(event.key==='Enter')addSubtareaInline('${t.id}')">
+            <button onclick="addSubtareaInline('${t.id}')">+ Agregar</button>
+          </div>
+          ${t.notas?`<div style="margin-top:8px;padding:8px 12px;background:var(--azul-bg);border-radius:8px;font-size:12px;color:var(--azul-medio)">📝 ${t.notas}</div>`:''}
+        </div>`:''}
+      </div>`;
+    });
+  });
+  c.innerHTML=html;
+}
+
+function toggleTareaRow(tid){
+  const el=document.getElementById(tid);
+  const btn=document.getElementById('exp-'+tid);
+  if(!el)return;
+  const open=el.style.display==='none'||el.style.display==='';
+  el.style.display=open?'block':'none';
+  if(btn)btn.classList.toggle('open',open);
+}
+window.toggleTareaRow=toggleTareaRow;
+
+function renderTareasKanban(filtered){
+  const cols=['Pendiente','En proceso','Completada','Bloqueada'];
+  cols.forEach(est=>{
+    const grupo=filtered.filter(t=>t.estado===est);
+    document.getElementById('k-count-'+est).textContent=grupo.length;
+    const c=document.getElementById('kanban-'+est);
+    if(!grupo.length){c.innerHTML=`<div style="text-align:center;padding:20px;font-size:12px;color:var(--gris)">Sin tareas</div>`;return;}
+    c.innerHTML=grupo.map(t=>{
+      const respNom=implementadores.find(i=>i.id===t.resp)?.nombre||'';
+      const subs=t.subtareas||[];
+      const done=subs.filter(s=>s.done).length;
+      return`<div class="kanban-card" onclick="openModalTarea('${t.id}')">
+        <div class="k-titulo">${t.titulo}</div>
+        ${respNom?`<div class="k-sub">👤 ${respNom}</div>`:''}
+        <div class="k-foot">
+          <span class="${prioClass(t.prio)}">${t.prio}</span>
+          <span class="${venceColor(t.fecha)}">${venceLabel(t.fecha)}</span>
+        </div>
+        ${subs.length?`<div class="sub-progress" style="margin-top:8px"><div class="sub-progress-fill" style="width:${Math.round(done/subs.length*100)}%"></div></div>`:''}
+      </div>`;
+    }).join('');
+  });
+}
+
+// ── Modal Tarea ────────────────────────────────────────────────────────────
+function openModalTarea(id){
+  const t=id?tareas.find(x=>x.id===id):null;
+  document.getElementById('mtarea-title').textContent=t?'Editar Tarea':'Nueva Tarea';
+  document.getElementById('tarea-id').value=t?t.id:'';
+  document.getElementById('t-titulo').value=t?t.titulo:'';
+  document.getElementById('t-estado').value=t?t.estado:'Pendiente';
+  document.getElementById('t-prio').value=t?t.prio:'Alta';
+  document.getElementById('t-fecha').value=t?t.fecha||'':'';
+  document.getElementById('t-notas').value=t?t.notas||'':'';
+  document.getElementById('t-plazo').value=t?t.plazo||'':'';
+  // Responsable
+  const sr=document.getElementById('t-resp');
+  sr.innerHTML='<option value="">Sin asignar</option>'+
+    implementadores.filter(i=>i.activo!==false).map(i=>`<option value="${i.id}">${i.nombre}</option>`).join('');
+  if(t&&t.resp)sr.value=t.resp;
+  // Dependencia
+  const sd=document.getElementById('t-dep');
+  sd.innerHTML='<option value="">Sin dependencia</option>'+
+    deps.map(d=>`<option value="${d.id}">${d.nombre}</option>`).join('');
+  if(t&&t.dep)sd.value=t.dep;
+  // Componente
+  const sc=document.getElementById('t-comp');
+  sc.innerHTML='<option value="">Sin componente</option>'+
+    COMPONENTES.map(c=>`<option value="${c.id}">${c.i} ${c.n}</option>`).join('');
+  if(t&&t.comp)sc.value=t.comp;
+  // Subtareas
+  modalSubtareas=t&&t.subtareas?JSON.parse(JSON.stringify(t.subtareas)):[];
+  renderModalSubtareas();
+  document.getElementById('modal-tarea').classList.add('open');
+}
+window.openModalTarea=openModalTarea;
+
+function renderModalSubtareas(){
+  const c=document.getElementById('modal-subtareas-list');
+  if(!modalSubtareas.length){c.innerHTML='';return;}
+  c.innerHTML=modalSubtareas.map((s,i)=>`
+    <div class="subtarea-row">
+      <input type="checkbox" class="sub-check" ${s.done?'checked':''} onchange="modalSubtareas[${i}].done=this.checked;renderModalSubtareas()">
+      <span class="sub-titulo ${s.done?'done':''}">${s.titulo}</span>
+      <button class="btn btn-sm" style="padding:2px 6px;font-size:11px;background:none;border:none;color:var(--rojo);cursor:pointer" onclick="modalSubtareas.splice(${i},1);renderModalSubtareas()">✕</button>
+    </div>`).join('');
+}
+window.renderModalSubtareas=renderModalSubtareas;
+
+function addSubtareaModal(){
+  const inp=document.getElementById('nueva-subtarea-input');
+  const v=inp.value.trim();
+  if(!v)return;
+  modalSubtareas.push({titulo:v,done:false});
+  inp.value='';
+  renderModalSubtareas();
+}
+window.addSubtareaModal=addSubtareaModal;
+
+async function saveTarea(){
+  const titulo=document.getElementById('t-titulo').value.trim();
+  if(!titulo){alert('El título es obligatorio');return;}
+  const id=document.getElementById('tarea-id').value||uid();
+  const isNew=!document.getElementById('tarea-id').value;
+  // calcular id_num
+  let id_num;
+  if(isNew){
+    const maxNum=tareas.length?Math.max(...tareas.map(t=>t.id_num||0)):0;
+    id_num=maxNum+1;
+  } else {
+    id_num=tareas.find(t=>t.id===id)?.id_num||0;
+  }
+  const data={
+    titulo,
+    estado:document.getElementById('t-estado').value,
+    prio:document.getElementById('t-prio').value,
+    resp:document.getElementById('t-resp').value,
+    dep:document.getElementById('t-dep').value,
+    comp:document.getElementById('t-comp').value,
+    fecha:document.getElementById('t-fecha').value,
+    plazo:document.getElementById('t-plazo').value,
+    notas:document.getElementById('t-notas').value,
+    subtareas:modalSubtareas,
+    id_num,
+    upd:new Date().toISOString(),
+  };
+  try{
+    await window._set(window._doc(window._db,'tareas',id),data);
+    closeModal('modal-tarea');
+    await loadAll();
+    renderTareas();
+    renderDashboard();
+  }catch(e){alert('Error al guardar: '+e.message);}
+}
+window.saveTarea=saveTarea;
+
+async function deleteTarea(id){
+  if(!confirm('¿Eliminar esta tarea y todas sus subtareas?'))return;
+  try{
+    await window._del(window._doc(window._db,'tareas',id));
+    await loadAll();renderTareas();renderDashboard();
+  }catch(e){alert('Error: '+e.message);}
+}
+window.deleteTarea=deleteTarea;
+
+async function toggleSubtarea(tareaId,subIdx,done){
+  const t=tareas.find(x=>x.id===tareaId);
+  if(!t||!t.subtareas)return;
+  t.subtareas[subIdx].done=done;
+  try{
+    await window._set(window._doc(window._db,'tareas',tareaId),{...t,upd:new Date().toISOString()});
+    await loadAll();renderTareas();
+  }catch(e){console.error(e);}
+}
+window.toggleSubtarea=toggleSubtarea;
+
+async function deleteSubtarea(tareaId,subIdx){
+  const t=tareas.find(x=>x.id===tareaId);
+  if(!t||!t.subtareas)return;
+  t.subtareas.splice(subIdx,1);
+  try{
+    await window._set(window._doc(window._db,'tareas',tareaId),{...t,upd:new Date().toISOString()});
+    await loadAll();renderTareas();
+  }catch(e){console.error(e);}
+}
+window.deleteSubtarea=deleteSubtarea;
+
+async function addSubtareaInline(tareaId){
+  const inp=document.getElementById('inline-sub-'+tareaId);
+  if(!inp)return;
+  const v=inp.value.trim();
+  if(!v)return;
+  const t=tareas.find(x=>x.id===tareaId);
+  if(!t)return;
+  if(!t.subtareas)t.subtareas=[];
+  t.subtareas.push({titulo:v,done:false});
+  inp.value='';
+  try{
+    await window._set(window._doc(window._db,'tareas',tareaId),{...t,upd:new Date().toISOString()});
+    await loadAll();renderTareas();
+  }catch(e){console.error(e);}
+}
+window.addSubtareaInline=addSubtareaInline;
+
+// ── Integrar tareas en dashboard (alertas de vencimiento) ─────────────────
+const _origRenderDash=renderDashboard;
+function renderDashboardConTareas(){
+  _origRenderDash();
+  // Inyectar alerta de tareas vencidas en el panel de alertas
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const venc=tareas.filter(t=>t.fecha&&new Date(t.fecha+'T00:00:00')<hoy&&t.estado!=='Completada');
+  const prox=tareas.filter(t=>{
+    if(!t.fecha||t.estado==='Completada')return false;
+    const d=new Date(t.fecha+'T00:00:00');
+    const diff=Math.round((d-hoy)/(1000*60*60*24));
+    return diff>=0&&diff<=3;
+  });
+  const panel=document.getElementById('alertas-panel');
+  let extra='';
+  venc.forEach(t=>extra+=`<div class="alert alert-danger">🔴 Tarea VENCIDA: <strong>${t.titulo}</strong> (venció ${t.fecha})</div>`);
+  prox.forEach(t=>extra+=`<div class="alert alert-warning">⏰ Tarea próxima a vencer: <strong>${t.titulo}</strong> — ${venceLabel(t.fecha)}</div>`);
+  if(extra&&panel)panel.innerHTML=extra+panel.innerHTML;
+}
+window.renderDashboard=renderDashboardConTareas;
+
 // ======== RENDER ALL ========
-function renderAll(){renderDashboard();renderOrg();renderDeps();renderEPs();renderSis();renderReuniones();renderReportes();}
+function renderAll(){renderDashboard();renderOrg();renderDeps();renderEPs();renderSis();renderReuniones();renderTareas();renderReportes();}
+
 </script>
 </body>
 </html>
