@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIPD-MDMQ v2 — Sistema de Protección de Datos</title>
+<title>SIPD-MDMQ v4 — Sistema de Protección de Datos</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -272,6 +272,7 @@ tbody tr:last-child{border-bottom:none}
 .t-stat .tv{font-size:26px;font-weight:700;color:var(--azul)}
 .t-stat .tl{font-size:11px;color:var(--gris);margin-top:2px}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -281,7 +282,7 @@ tbody tr:last-child{border-bottom:none}
     <div class="login-logo">
       <div class="escudo">🛡️</div>
       <h1>SIPD-MDMQ</h1>
-      <p>Sistema de Protección de Datos Personales<br>Municipio del Distrito Metropolitano de Quito</p>
+      <p>Sistema de Protección de Datos Personales<br>Municipio del Distrito Metropolitano de Quito<br><span style="color:#22C55E;font-size:11px;font-weight:700">✅ VERSIÓN EXCEL — Abr 2026</span></p>
     </div>
     <div class="form-group">
       <label>Correo electrónico</label>
@@ -302,7 +303,7 @@ tbody tr:last-child{border-bottom:none}
     <div class="sidebar-brand">
       <div class="brand-icon">🛡️</div>
       <h2>SIPD-MDMQ</h2>
-      <p>Protección de Datos — v2.0</p>
+      <p>Protección de Datos — v4.0</p>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -434,6 +435,11 @@ tbody tr:last-child{border-bottom:none}
           <select id="sis-f-sec" onchange="renderSis()"><option value="">Todas las secretarías</option></select>
           <select id="sis-f-riesgo" onchange="renderSis()"><option value="">Todos los riesgos</option><option>Alto</option><option>Medio</option><option>Bajo</option></select>
           <button class="btn btn-primary" onclick="openModalSis(null)">➕ Nuevo Sistema</button>
+          <label class="btn btn-secondary" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px" title="Importar desde Excel DMQ">
+            📂 Importar Excel
+            <input type="file" id="sis-import-file" accept=".xlsx" style="display:none" onchange="importarSistemasExcel(this)">
+          </label>
+          <div id="sis-import-status" style="font-size:12px;color:var(--gris)"></div>
         </div>
         <div class="card"><div class="card-body table-wrap"><table>
           <thead><tr><th>Sistema</th><th>Secretaría</th><th>Responsable</th><th>Tipo</th><th>Datos Pers.</th><th>Sensibles</th><th>Riesgo</th><th>EIPD</th><th>Acciones</th></tr></thead>
@@ -472,6 +478,7 @@ tbody tr:last-child{border-bottom:none}
             <button class="vista-btn" id="vbtn-kanban" onclick="switchVistaTareas('kanban')">⊞ Kanban</button>
           </div>
           <button class="btn btn-primary" onclick="openModalTarea(null)">➕ Nueva Tarea</button>
+          <button class="btn btn-secondary" onclick="reporteTareas()">📥 Reporte</button>
         </div>
         <!-- Estadísticas rápidas -->
         <div class="t-stats" id="tareas-stats"></div>
@@ -781,6 +788,43 @@ tbody tr:last-child{border-bottom:none}
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-sis')">Cancelar</button>
       <button class="btn btn-primary" onclick="saveSis()">💾 Guardar Sistema</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Reporte Tareas -->
+<div class="modal-overlay" id="modal-reporte-tareas">
+  <div class="modal" style="max-width:960px">
+    <div class="modal-header">
+      <h3>📊 Reporte de Tareas y Subtareas — SIPD-MDMQ</h3>
+      <button class="modal-close" onclick="closeModal('modal-reporte-tareas')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px">
+      <!-- Filtros del reporte -->
+      <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center">
+        <select id="rep-f-estado" onchange="renderReporteTareas()" style="padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none">
+          <option value="">Todos los estados</option>
+          <option>Pendiente</option><option>En proceso</option><option>Completada</option><option>Bloqueada</option>
+        </select>
+        <select id="rep-f-prio" onchange="renderReporteTareas()" style="padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none">
+          <option value="">Todas las prioridades</option>
+          <option>Crítica</option><option>Alta</option><option>Media</option><option>Baja</option>
+        </select>
+        <select id="rep-f-resp2" onchange="renderReporteTareas()" style="padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none">
+          <option value="">Todos los responsables</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="btn btn-sm btn-secondary" onclick="exportReporteTareasXLSX()">📊 Excel</button>
+          <button class="btn btn-sm btn-secondary" onclick="imprimirReporteTareas()">🖨️ Imprimir</button>
+        </div>
+      </div>
+      <!-- Resumen ejecutivo -->
+      <div id="rep-tareas-resumen" style="margin-bottom:18px"></div>
+      <!-- Tabla -->
+      <div id="rep-tareas-tabla" class="table-wrap"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-reporte-tareas')">Cerrar</button>
     </div>
   </div>
 </div>
@@ -2165,27 +2209,64 @@ function prioClass(p){
 function estClass(e){
   return{'Pendiente':'est-pendiente','En proceso':'est-proceso','Completada':'est-completada','Bloqueada':'est-bloqueada'}[e]||'est-pendiente';
 }
+function calcTareaAvance(t){
+  const subs=t.subtareas||[];
+  if(!subs.length){
+    // sin subtareas: completada=100%, resto según estado
+    if(t.estado==='Completada')return 100;
+    if(t.estado==='En proceso')return 50;
+    if(t.estado==='Bloqueada')return 0;
+    return 0;
+  }
+  return Math.round(subs.filter(s=>s.done).length/subs.length*100);
+}
+
+function avanceCircle(pct,size=36){
+  const r=14,circ=2*Math.PI*r;
+  const fill=circ*(pct/100);
+  const color=pct>=80?'var(--verde)':pct>=40?'var(--naranja)':'var(--rojo)';
+  return`<svg width="${size}" height="${size}" viewBox="0 0 36 36" style="flex-shrink:0">
+    <circle cx="18" cy="18" r="${r}" fill="none" stroke="var(--borde)" stroke-width="3"/>
+    <circle cx="18" cy="18" r="${r}" fill="none" stroke="${color}" stroke-width="3"
+      stroke-dasharray="${fill} ${circ}" stroke-dashoffset="${circ*0.25}"
+      stroke-linecap="round" transform="rotate(-90 18 18)"/>
+    <text x="18" y="22" text-anchor="middle" font-size="9" font-weight="700"
+      fill="${color}" font-family="DM Sans,sans-serif">${pct}%</text>
+  </svg>`;
+}
+
 function subProgress(t){
   const subs=t.subtareas||[];
-  if(!subs.length)return'';
-  const done=subs.filter(s=>s.done).length;
-  const pct=Math.round(done/subs.length*100);
-  return`<div style="margin-top:6px;font-size:10px;color:var(--gris)">${done}/${subs.length} subtareas</div>
-    <div class="sub-progress"><div class="sub-progress-fill" style="width:${pct}%"></div></div>`;
+  const pct=calcTareaAvance(t);
+  const color=pct>=80?'var(--verde)':pct>=40?'var(--naranja)':'var(--rojo)';
+  const label=subs.length?`${subs.filter(s=>s.done).length}/${subs.length} subtareas`:`${pct}%`;
+  return`<div style="display:flex;align-items:center;gap:8px;margin-top:7px">
+    <div style="flex:1">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:10px;color:var(--gris)">${label}</span>
+        <span style="font-size:10px;font-weight:700;color:${color}">${pct}%</span>
+      </div>
+      <div class="sub-progress"><div class="sub-progress-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>
+  </div>`;
 }
 
 function renderTareasStats(filtered){
   const total=tareas.length;
-  const pend=tareas.filter(t=>t.estado==='Pendiente').length;
   const proc=tareas.filter(t=>t.estado==='En proceso').length;
   const comp=tareas.filter(t=>t.estado==='Completada').length;
   const hoy=new Date();hoy.setHours(0,0,0,0);
   const venc=tareas.filter(t=>t.fecha&&new Date(t.fecha+'T00:00:00')<hoy&&t.estado!=='Completada').length;
+  const avgs=tareas.map(t=>calcTareaAvance(t));
+  const avgAvance=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length):0;
+  const color=avgAvance>=80?'var(--verde)':avgAvance>=40?'var(--naranja)':'var(--rojo)';
   document.getElementById('tareas-stats').innerHTML=`
     <div class="t-stat"><div class="tv">${total}</div><div class="tl">Total tareas</div></div>
     <div class="t-stat"><div class="tv" style="color:var(--naranja)">${proc}</div><div class="tl">En proceso</div></div>
     <div class="t-stat"><div class="tv" style="color:var(--verde)">${comp}</div><div class="tl">Completadas</div></div>
-    <div class="t-stat"><div class="tv" style="color:${venc>0?'var(--rojo)':'var(--gris)'}">${venc}</div><div class="tl">Vencidas</div></div>`;
+    <div class="t-stat" style="flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <div style="display:flex;align-items:center;gap:8px">${avanceCircle(avgAvance,40)}<div><div class="tv" style="color:${color};font-size:22px">${avgAvance}%</div><div class="tl">Avance general</div></div></div>
+    </div>`;
 }
 
 function renderTareas(){
@@ -2280,15 +2361,23 @@ function renderTareasKanban(filtered){
     c.innerHTML=grupo.map(t=>{
       const respNom=implementadores.find(i=>i.id===t.resp)?.nombre||'';
       const subs=t.subtareas||[];
-      const done=subs.filter(s=>s.done).length;
+      const pct=calcTareaAvance(t);
+      const color=pct>=80?'var(--verde)':pct>=40?'var(--naranja)':'var(--rojo)';
       return`<div class="kanban-card" onclick="openModalTarea('${t.id}')">
-        <div class="k-titulo">${t.titulo}</div>
-        ${respNom?`<div class="k-sub">👤 ${respNom}</div>`:''}
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px">
+          <div style="flex:1"><div class="k-titulo">${t.titulo}</div>
+          ${respNom?`<div class="k-sub">👤 ${respNom}</div>`:''}
+          </div>
+          ${avanceCircle(pct,34)}
+        </div>
         <div class="k-foot">
           <span class="${prioClass(t.prio)}">${t.prio}</span>
           <span class="${venceColor(t.fecha)}">${venceLabel(t.fecha)}</span>
         </div>
-        ${subs.length?`<div class="sub-progress" style="margin-top:8px"><div class="sub-progress-fill" style="width:${Math.round(done/subs.length*100)}%"></div></div>`:''}
+        ${subs.length?`<div style="margin-top:6px">
+          <div class="sub-progress"><div class="sub-progress-fill" style="width:${pct}%;background:${color}"></div></div>
+          <div style="font-size:9px;color:var(--gris);margin-top:2px">${subs.filter(s=>s.done).length}/${subs.length} subtareas</div>
+        </div>`:''}
       </div>`;
     }).join('');
   });
@@ -2454,6 +2543,479 @@ function renderDashboardConTareas(){
   if(extra&&panel)panel.innerHTML=extra+panel.innerHTML;
 }
 window.renderDashboard=renderDashboardConTareas;
+
+// ======== REPORTE DE TAREAS ========
+function reporteTareas(){
+  // poblar selector responsable
+  const sel=document.getElementById('rep-f-resp2');
+  sel.innerHTML='<option value="">Todos los responsables</option>'+
+    implementadores.filter(i=>i.activo!==false).map(i=>`<option value="${i.id}">${i.nombre}</option>`).join('');
+  // resetear filtros
+  document.getElementById('rep-f-estado').value='';
+  document.getElementById('rep-f-prio').value='';
+  sel.value='';
+  renderReporteTareas();
+  document.getElementById('modal-reporte-tareas').classList.add('open');
+}
+window.reporteTareas=reporteTareas;
+
+function filtrarRep(){
+  const fe=document.getElementById('rep-f-estado').value;
+  const fp=document.getElementById('rep-f-prio').value;
+  const fr=document.getElementById('rep-f-resp2').value;
+  return tareas.filter(t=>(!fe||t.estado===fe)&&(!fp||t.prio===fp)&&(!fr||t.resp===fr));
+}
+
+function renderReporteTareas(){
+  const lista=filtrarRep();
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+
+  // --- Resumen ejecutivo ---
+  const total=lista.length;
+  const comp=lista.filter(t=>t.estado==='Completada').length;
+  const proc=lista.filter(t=>t.estado==='En proceso').length;
+  const pend=lista.filter(t=>t.estado==='Pendiente').length;
+  const bloq=lista.filter(t=>t.estado==='Bloqueada').length;
+  const venc=lista.filter(t=>t.fecha&&new Date(t.fecha+'T00:00:00')<hoy&&t.estado!=='Completada').length;
+  const avgs=lista.map(t=>calcTareaAvance(t));
+  const avg=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length):0;
+  const colorAvg=avg>=80?'var(--verde)':avg>=40?'var(--naranja)':'var(--rojo)';
+
+  const totalSubs=lista.reduce((a,t)=>(t.subtareas||[]).length+a,0);
+  const doneSubs=lista.reduce((a,t)=>(t.subtareas||[]).filter(s=>s.done).length+a,0);
+
+  document.getElementById('rep-tareas-resumen').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+      <div style="background:var(--azul-bg);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:var(--azul)">${total}</div>
+        <div style="font-size:11px;color:var(--gris)">Tareas en reporte</div>
+      </div>
+      <div style="background:var(--verde-bg);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:var(--verde)">${comp}</div>
+        <div style="font-size:11px;color:var(--gris)">Completadas</div>
+      </div>
+      <div style="background:var(--naranja-bg);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:var(--naranja)">${proc}</div>
+        <div style="font-size:11px;color:var(--gris)">En proceso</div>
+      </div>
+      <div style="background:${venc>0?'var(--rojo-bg)':'var(--gris-claro)'};border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:${venc>0?'var(--rojo)':'var(--gris)'}">${venc}</div>
+        <div style="font-size:11px;color:var(--gris)">Vencidas</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;padding:10px 16px;background:var(--gris-claro);border-radius:10px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:10px">${avanceCircle(avg,40)}
+        <div><div style="font-size:16px;font-weight:700;color:${colorAvg}">${avg}% avance general</div>
+        <div style="font-size:11px;color:var(--gris)">${doneSubs}/${totalSubs} subtareas completadas</div></div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:16px;font-size:12px;color:var(--gris)">
+        <span>⚪ Pendiente: <strong>${pend}</strong></span>
+        <span>🚫 Bloqueada: <strong>${bloq}</strong></span>
+      </div>
+    </div>`;
+
+  // --- Tabla detallada ---
+  if(!lista.length){
+    document.getElementById('rep-tareas-tabla').innerHTML='<div class="empty-state"><div class="icon">📋</div><h4>Sin tareas con los filtros seleccionados</h4></div>';
+    return;
+  }
+
+  let html=`<table style="font-size:12px">
+    <thead><tr>
+      <th style="width:60px">N°</th>
+      <th>Tarea</th>
+      <th style="width:100px">Estado</th>
+      <th style="width:80px">Prioridad</th>
+      <th style="width:110px">Responsable</th>
+      <th style="width:90px">Vence</th>
+      <th style="width:80px">% Avance</th>
+      <th style="width:120px">Subtareas</th>
+    </tr></thead><tbody>`;
+
+  lista.forEach(t=>{
+    const subs=t.subtareas||[];
+    const pct=calcTareaAvance(t);
+    const colorPct=pct>=80?'var(--verde)':pct>=40?'var(--naranja)':'var(--rojo)';
+    const respNom=implementadores.find(i=>i.id===t.resp)?.nombre||'—';
+    const depNom=deps.find(d=>d.id===t.dep)?.nombre||'';
+    const compNom=COMPONENTES.find(c=>c.id===t.comp)?.n||'';
+    const doneSub=subs.filter(s=>s.done).length;
+    const isVenc=t.fecha&&new Date(t.fecha+'T00:00:00')<hoy&&t.estado!=='Completada';
+
+    // Fila principal de la tarea
+    html+=`<tr style="background:${isVenc?'#FFF5F5':''}">
+      <td style="font-weight:700;color:var(--gris);text-align:center">T-${String(t.id_num||0).padStart(3,'0')}</td>
+      <td>
+        <div style="font-weight:600;color:var(--azul);margin-bottom:2px">${t.titulo}</div>
+        ${depNom?`<div style="font-size:10px;color:var(--gris)">🏛️ ${depNom}</div>`:''}
+        ${compNom?`<div style="font-size:10px;color:var(--gris)">📦 ${compNom}</div>`:''}
+        ${t.notas?`<div style="font-size:10px;color:var(--gris);font-style:italic;margin-top:2px">📝 ${t.notas}</div>`:''}
+        ${t.plazo?`<div style="font-size:10px;color:var(--rojo)">⚖️ ${t.plazo}</div>`:''}
+      </td>
+      <td><span class="${estClass(t.estado)}">${t.estado}</span></td>
+      <td><span class="${prioClass(t.prio)}">${t.prio}</span></td>
+      <td style="font-size:11px">${respNom}</td>
+      <td><span class="${venceColor(t.fecha)}" style="font-size:11px">${t.fecha?venceLabel(t.fecha):'—'}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="flex:1;height:6px;background:var(--borde);border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${colorPct};border-radius:99px"></div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:${colorPct};min-width:28px;text-align:right">${pct}%</span>
+        </div>
+      </td>
+      <td style="font-size:11px;color:var(--gris)">${subs.length?`${doneSub}/${subs.length} hechas`:'Sin subtareas'}</td>
+    </tr>`;
+
+    // Filas de subtareas (si las hay)
+    subs.forEach((s,si)=>{
+      html+=`<tr style="background:${s.done?'#F0FDF4':'var(--gris-claro)'}">
+        <td style="text-align:center;color:var(--gris);font-size:10px">↳ S${si+1}</td>
+        <td style="padding-left:24px;font-size:11px;color:${s.done?'var(--verde)':'var(--texto)'}">
+          <span style="${s.done?'text-decoration:line-through;opacity:.7':''}">${s.titulo}</span>
+        </td>
+        <td colspan="6" style="font-size:10px;color:${s.done?'var(--verde)':'var(--gris)'}">
+          ${s.done?'✅ Completada':'⬜ Pendiente'}
+        </td>
+      </tr>`;
+    });
+  });
+
+  html+='</tbody></table>';
+  document.getElementById('rep-tareas-tabla').innerHTML=html;
+}
+window.renderReporteTareas=renderReporteTareas;
+
+function exportReporteTareasXLSX(){
+  const lista=filtrarRep();
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const fecha=new Date().toISOString().slice(0,10);
+
+  // ── Hoja 1: Resumen ──────────────────────────────────────────────────────
+  const avgs=lista.map(t=>calcTareaAvance(t));
+  const avgGen=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length):0;
+  const totalSubs=lista.reduce((a,t)=>(t.subtareas||[]).length+a,0);
+  const doneSubs=lista.reduce((a,t)=>(t.subtareas||[]).filter(s=>s.done).length+a,0);
+
+  const resumen=[
+    ['SIPD-MDMQ — Reporte de Tareas y Subtareas'],
+    ['Generado:', fecha],
+    [''],
+    ['RESUMEN EJECUTIVO'],
+    ['Total tareas en reporte',lista.length],
+    ['Completadas',lista.filter(t=>t.estado==='Completada').length],
+    ['En proceso',lista.filter(t=>t.estado==='En proceso').length],
+    ['Pendientes',lista.filter(t=>t.estado==='Pendiente').length],
+    ['Bloqueadas',lista.filter(t=>t.estado==='Bloqueada').length],
+    ['Vencidas (sin completar)',lista.filter(t=>t.fecha&&new Date(t.fecha+'T00:00:00')<hoy&&t.estado!=='Completada').length],
+    [''],
+    ['Avance general (%)',avgGen+'%'],
+    ['Total subtareas',totalSubs],
+    ['Subtareas completadas',doneSubs],
+    ['Subtareas pendientes',totalSubs-doneSubs],
+    [''],
+    ['AVANCE POR RESPONSABLE'],
+    ['Responsable','Tareas asignadas','Completadas','En proceso','% Avance'],
+  ];
+  // agrupar por responsable
+  const porResp={};
+  lista.forEach(t=>{
+    const k=implementadores.find(i=>i.id===t.resp)?.nombre||'Sin asignar';
+    if(!porResp[k])porResp[k]={total:0,comp:0,proc:0,avgs:[]};
+    porResp[k].total++;
+    if(t.estado==='Completada')porResp[k].comp++;
+    if(t.estado==='En proceso')porResp[k].proc++;
+    porResp[k].avgs.push(calcTareaAvance(t));
+  });
+  Object.entries(porResp).forEach(([r,v])=>{
+    const avg=Math.round(v.avgs.reduce((a,b)=>a+b,0)/v.avgs.length);
+    resumen.push([r,v.total,v.comp,v.proc,avg+'%']);
+  });
+
+  const wsRes=XLSX.utils.aoa_to_sheet(resumen);
+  wsRes['!cols']=[{wch:35},{wch:20},{wch:16},{wch:16},{wch:14}];
+
+  // ── Hoja 2: Detalle Tareas ────────────────────────────────────────────────
+  const headers=['N° Tarea','Título','Estado','Prioridad','Responsable',
+    'Dependencia','Componente SIPD','Fecha Límite','Estado Vencimiento',
+    '% Avance','Total Subtareas','Subtareas Completadas','Plazo Legal','Notas'];
+  const detalle=[headers];
+
+  lista.forEach(t=>{
+    const subs=t.subtareas||[];
+    const pct=calcTareaAvance(t);
+    const respNom=implementadores.find(i=>i.id===t.resp)?.nombre||'';
+    const depNom=deps.find(d=>d.id===t.dep)?.nombre||'';
+    const compNom=COMPONENTES.find(c=>c.id===t.comp)?.n||'';
+    const isVenc=t.fecha&&new Date(t.fecha+'T00:00:00')<hoy&&t.estado!=='Completada';
+    detalle.push([
+      'T-'+String(t.id_num||0).padStart(3,'0'),
+      t.titulo, t.estado, t.prio, respNom, depNom, compNom,
+      t.fecha||'', isVenc?'VENCIDA':'Al día',
+      pct+'%', subs.length, subs.filter(s=>s.done).length,
+      t.plazo||'', t.notas||''
+    ]);
+  });
+
+  const wsDet=XLSX.utils.aoa_to_sheet(detalle);
+  wsDet['!cols']=[
+    {wch:10},{wch:45},{wch:14},{wch:12},{wch:22},
+    {wch:38},{wch:35},{wch:14},{wch:16},
+    {wch:10},{wch:14},{wch:18},{wch:30},{wch:40}
+  ];
+  // Fila de encabezado en negrita/fondo azul vía estilo de celda
+  headers.forEach((_,ci)=>{
+    const addr=XLSX.utils.encode_cell({r:0,c:ci});
+    if(!wsDet[addr])return;
+    wsDet[addr].s={
+      font:{bold:true,color:{rgb:'FFFFFF'}},
+      fill:{fgColor:{rgb:'1B3A6B'}},
+      alignment:{horizontal:'center',wrapText:true}
+    };
+  });
+
+  // ── Hoja 3: Detalle Subtareas ─────────────────────────────────────────────
+  const subHeaders=['N° Tarea','Título Tarea','N° Subtarea','Subtarea','Estado Subtarea','% Aportado'];
+  const subDetalle=[subHeaders];
+
+  lista.forEach(t=>{
+    const subs=t.subtareas||[];
+    if(!subs.length){
+      subDetalle.push([
+        'T-'+String(t.id_num||0).padStart(3,'0'),
+        t.titulo,'—','(Sin subtareas)','—','—'
+      ]);
+      return;
+    }
+    subs.forEach((s,si)=>{
+      subDetalle.push([
+        'T-'+String(t.id_num||0).padStart(3,'0'),
+        t.titulo,
+        'S-'+String(si+1).padStart(2,'0'),
+        s.titulo,
+        s.done?'Completada':'Pendiente',
+        s.done?'100%':'0%'
+      ]);
+    });
+  });
+
+  const wsSub=XLSX.utils.aoa_to_sheet(subDetalle);
+  wsSub['!cols']=[{wch:10},{wch:45},{wch:12},{wch:45},{wch:18},{wch:14}];
+  subHeaders.forEach((_,ci)=>{
+    const addr=XLSX.utils.encode_cell({r:0,c:ci});
+    if(!wsSub[addr])return;
+    wsSub[addr].s={
+      font:{bold:true,color:{rgb:'FFFFFF'}},
+      fill:{fgColor:{rgb:'2E5FA3'}},
+      alignment:{horizontal:'center'}
+    };
+  });
+
+  // ── Ensamblar y descargar ─────────────────────────────────────────────────
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,wsRes,'Resumen');
+  XLSX.utils.book_append_sheet(wb,wsDet,'Detalle Tareas');
+  XLSX.utils.book_append_sheet(wb,wsSub,'Subtareas');
+
+  XLSX.writeFile(wb,`SIPD_MDMQ_Tareas_${fecha}.xlsx`);
+}
+window.exportReporteTareasXLSX=exportReporteTareasXLSX;
+
+function imprimirReporteTareas(){
+  const lista=filtrarRep();
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const avgs=lista.map(t=>calcTareaAvance(t));
+  const avg=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length):0;
+  const comp=lista.filter(t=>t.estado==='Completada').length;
+
+  let body=`<html><head><meta charset="UTF-8">
+  <title>Reporte Tareas SIPD-MDMQ</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:11px;color:#1E293B;margin:20px}
+    h1{font-size:16px;color:#1B3A6B;margin-bottom:4px}
+    h2{font-size:13px;color:#2E5FA3;margin:16px 0 6px;border-bottom:2px solid #EBF3FB;padding-bottom:4px}
+    .resumen{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+    .res-card{background:#EBF3FB;border-radius:6px;padding:8px;text-align:center}
+    .res-card .v{font-size:18px;font-weight:700;color:#1B3A6B}
+    .res-card .l{font-size:10px;color:#64748B}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th{background:#1B3A6B;color:white;padding:6px 8px;text-align:left;font-size:10px}
+    td{padding:5px 8px;border-bottom:1px solid #E2E8F0;vertical-align:top}
+    tr.subtarea td{background:#F8FAFC;color:#64748B;font-style:italic}
+    tr.vencida td{background:#FFF5F5}
+    .badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700}
+    .b-comp{background:#E6F4EE;color:#0D6E4E}
+    .b-proc{background:#FFF0E0;color:#C85A00}
+    .b-pend{background:#FEE2E2;color:#B91C1C}
+    .b-bloq{background:#FEE2E2;color:#B91C1C;border:1px solid #FECACA}
+    .b-crit{background:#FEE2E2;color:#B91C1C}
+    .b-alta{background:#FFF0E0;color:#C85A00}
+    .b-med{background:#EBF3FB;color:#2E5FA3}
+    .b-baja{background:#F1F5F9;color:#64748B}
+    .pct-bar{display:inline-block;width:60px;height:6px;background:#E2E8F0;border-radius:3px;vertical-align:middle;margin-right:4px;overflow:hidden}
+    .pct-fill{height:100%;border-radius:3px}
+    @media print{@page{margin:15mm}}
+  </style></head><body>
+  <h1>🛡️ SIPD-MDMQ — Reporte de Tareas y Subtareas</h1>
+  <div style="font-size:11px;color:#64748B">Generado: ${new Date().toLocaleString('es-EC')} | Total: ${lista.length} tareas | Avance general: ${avg}% | Completadas: ${comp}/${lista.length}</div>
+  <table style="margin-top:12px">
+    <tr><th style="width:50px">N°</th><th>Tarea / Subtarea</th><th style="width:85px">Estado</th><th style="width:70px">Prioridad</th><th style="width:100px">Responsable</th><th style="width:80px">Vence</th><th style="width:90px">% Avance</th></tr>`;
+
+  lista.forEach(t=>{
+    const subs=t.subtareas||[];
+    const pct=calcTareaAvance(t);
+    const pcColor=pct>=80?'#0D6E4E':pct>=40?'#C85A00':'#B91C1C';
+    const respNom=implementadores.find(i=>i.id===t.resp)?.nombre||'—';
+    const bEst={Completada:'b-comp','En proceso':'b-proc',Pendiente:'b-pend',Bloqueada:'b-bloq'}[t.estado]||'b-pend';
+    const bPrio={Crítica:'b-crit',Alta:'b-alta',Media:'b-med',Baja:'b-baja'}[t.prio]||'b-baja';
+    const isVenc=t.fecha&&new Date(t.fecha+'T00:00:00')<hoy&&t.estado!=='Completada';
+    body+=`<tr class="${isVenc?'vencida':''}">
+      <td style="font-weight:700;color:#64748B">T-${String(t.id_num||0).padStart(3,'0')}</td>
+      <td><strong>${t.titulo}</strong>
+        ${t.notas?`<br><span style="font-size:9px;color:#64748B">${t.notas}</span>`:''}
+        ${t.plazo?`<br><span style="font-size:9px;color:#B91C1C">⚖️ ${t.plazo}</span>`:''}
+      </td>
+      <td><span class="badge ${bEst}">${t.estado}</span></td>
+      <td><span class="badge ${bPrio}">${t.prio}</span></td>
+      <td style="font-size:10px">${respNom}</td>
+      <td style="font-size:10px;color:${isVenc?'#B91C1C':'#64748B'}">${t.fecha||'—'}</td>
+      <td><span class="pct-bar"><span class="pct-fill" style="width:${pct}%;background:${pcColor}"></span></span><strong style="color:${pcColor}">${pct}%</strong></td>
+    </tr>`;
+    subs.forEach((s,si)=>{
+      body+=`<tr class="subtarea">
+        <td style="font-size:9px;color:#94A3B8;padding-left:12px">↳ S${si+1}</td>
+        <td style="padding-left:20px">${s.done?'✅':'⬜'} ${s.titulo}</td>
+        <td colspan="5" style="font-size:9px">${s.done?'Completada':'Pendiente'}</td>
+      </tr>`;
+    });
+  });
+
+  body+=`</table></body></html>`;
+  const w=window.open('','_blank','width=900,height=700');
+  w.document.write(body);
+  w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+window.imprimirReporteTareas=imprimirReporteTareas;
+
+// ======== IMPORTAR SISTEMAS DESDE EXCEL DMQ ========
+async function importarSistemasExcel(input){
+  const file = input.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('sis-import-status');
+  statusEl.textContent = '⏳ Leyendo archivo...';
+  statusEl.style.color = 'var(--gris)';
+
+  try {
+    const buf = await file.arrayBuffer();
+    const wb  = XLSX.read(buf, {type:'array', cellDates:true});
+
+    // ── Leer hoja DATOS ──────────────────────────────────────────────────
+    const wsDatos = wb.Sheets['DATOS'];
+    const wdRaw   = XLSX.utils.sheet_to_json(wsDatos, {header:1, defval:''});
+    if(!wsDatos){ alert('No se encontró la hoja "DATOS" en el Excel'); return; }
+
+    // ── Leer hoja RESPONSABLES ───────────────────────────────────────────
+    const wsResp = wb.Sheets['RESPONSABLES'];
+    const respRaw = wsResp ? XLSX.utils.sheet_to_json(wsResp, {header:1, defval:''}) : [];
+    const respMap = {};
+    respRaw.slice(1).forEach(r => {
+      const nom = String(r[0]||'').trim();
+      if(!nom) return;
+      if(!respMap[nom]) respMap[nom] = [];
+      respMap[nom].push({ nombre:String(r[2]||'').trim(), rol:String(r[3]||'').trim(), correo:String(r[4]||'').trim(), tel:String(r[5]||'').trim(), estado:String(r[6]||'').trim() });
+    });
+
+    // ── Leer hoja ARQUITECTURA ───────────────────────────────────────────
+    const wsArq = wb.Sheets['ARQUITECTURA'];
+    const arqRaw = wsArq ? XLSX.utils.sheet_to_json(wsArq, {header:1, defval:''}) : [];
+    const arqMap = {};
+    arqRaw.slice(1).forEach(r => {
+      const nom = String(r[0]||'').trim();
+      if(!nom) return;
+      if(!arqMap[nom]) arqMap[nom] = [];
+      arqMap[nom].push({ componente:String(r[2]||'').trim(), lenguaje:String(r[3]||'').trim(), framework:String(r[4]||'').trim(), bdd:String(r[6]||'').trim(), lenguajeBDD:String(r[7]||'').trim(), frameworkBDD:String(r[8]||'').trim() });
+    });
+
+    // ── Construir objetos por sistema ────────────────────────────────────
+    const filas = wdRaw.slice(1).filter(r => String(r[0]||'').trim());
+    const total = filas.length;
+    let ok=0, errores=[];
+
+    statusEl.textContent = `⏳ Importando 0 / ${total} sistemas...`;
+
+    for(let i=0; i<filas.length; i++){
+      const r = filas[i];
+      const nombre = String(r[0]||'').trim();
+
+      // Responsable principal
+      const resps = respMap[nombre] || [];
+      const admin = resps.find(x => x.rol === 'ADMINISTRADOR FUNCIONAL') || resps[0] || {};
+
+      const data = {
+        s_nom:  nombre,
+        s_alias:String(r[1]||'').trim(),
+        s_ver:  String(r[2]||'').trim(),
+        s_tipo: 'Aplicativo web',
+        s_prov: String(r[4]||'').trim(),
+        s_fecha:String(r[5]||'').trim(),
+        s_c6:   String(r[6]||'').trim(),   // Secretaría/Dependencia dueña
+        s_desc: String(r[7]||'').trim(),
+        // Responsable principal
+        s_rn: admin.nombre || '',
+        s_re: admin.correo || '',
+        s_rt: admin.tel    || '',
+        // Campos PDP — a completar en la herramienta
+        s_tdp:'Sí', s_ds:'No', s_dst:'', s_vol:'No determinado',
+        s_lic:'Interés público', s_cons:'', s_fin:'',
+        s_sg1:'No', s_sg2:'No', s_sg3:'No', s_sg4:'No', s_sg5:'No', s_sg6:'No evaluado',
+        s_pv1:'No', s_pv2:'', s_pv3:'', s_pv4:'No aplica', s_pv5:'No aplica', s_pv6:'', s_pv7:'No',
+        s_c1:'No', s_c2:'No aplica', s_c3:'No', s_c4:'Bajo', s_c5:'No',
+        s_pais:'Ecuador', s_prueba:'No',
+        // Datos extra del Excel (visible en modal, tab descripción)
+        _responsables: resps,
+        _arquitectura: arqMap[nombre] || [],
+        upd: new Date().toISOString(),
+      };
+
+      // ID basado en el alias o nombre limpio para evitar duplicados
+      const id = 'sis_' + (data.s_alias || nombre).toLowerCase()
+        .replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').substr(0,30)
+        + '_' + i;
+
+      try {
+        await window._set(window._doc(window._db, 'sistemas', id), data);
+        ok++;
+        statusEl.textContent = `⏳ Importando ${ok} / ${total} sistemas...`;
+      } catch(e) {
+        errores.push(nombre + ': ' + e.message);
+      }
+    }
+
+    // Recargar datos
+    await loadAll();
+    renderSis();
+    renderDashboard();
+
+    if(errores.length){
+      statusEl.textContent = `⚠️ ${ok}/${total} importados. ${errores.length} errores.`;
+      statusEl.style.color = 'var(--naranja)';
+      console.error('Errores importación:', errores);
+    } else {
+      statusEl.textContent = `✅ ${ok} sistemas importados correctamente`;
+      statusEl.style.color = 'var(--verde)';
+    }
+
+    // Limpiar el input para poder reimportar
+    input.value = '';
+
+  } catch(e) {
+    statusEl.textContent = '❌ Error: ' + e.message;
+    statusEl.style.color = 'var(--rojo)';
+    console.error(e);
+  }
+}
+window.importarSistemasExcel = importarSistemasExcel;
 
 // ======== RENDER ALL ========
 function renderAll(){renderDashboard();renderOrg();renderDeps();renderEPs();renderSis();renderReuniones();renderTareas();renderReportes();}
