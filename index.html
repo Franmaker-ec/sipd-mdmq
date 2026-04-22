@@ -746,6 +746,7 @@ tbody tr:last-child{border-bottom:none}
         <button class="tab-btn" onclick="showTab('st5',this)">🔒 Seguridad</button>
         <button class="tab-btn" onclick="showTab('st6',this)">🤝 Proveedor</button>
         <button class="tab-btn" onclick="showTab('st7',this)">📋 Cumplimiento</button>
+        <button class="tab-btn" onclick="showTab('st8',this)">⚙️ Arquitectura</button>
       </div>
       <div class="tab-panel active" id="tab-st1">
         <div class="form-row form-row-3"><div class="field"><label>Nombre responsable *</label><input type="text" id="s-rn"></div><div class="field"><label>Cargo</label><input type="text" id="s-rc"></div><div class="field"><label>Dirección/Secretaría</label><input type="text" id="s-rd"></div></div>
@@ -753,7 +754,7 @@ tbody tr:last-child{border-bottom:none}
         <div class="field"><label>Admin. técnico (si diferente)</label><input type="text" id="s-ran"></div>
       </div>
       <div class="tab-panel" id="tab-st2">
-        <div class="form-row form-row-2"><div class="field"><label>Nombre del sistema *</label><input type="text" id="s-nom"></div><div class="field"><label>Código interno</label><input type="text" id="s-cod"></div></div>
+        <div class="form-row form-row-3"><div class="field"><label>Nombre del sistema *</label><input type="text" id="s-nom"></div><div class="field"><label>Alias / Nombre corto</label><input type="text" id="s-alias" placeholder="Ej: ACERVO, APOLO..."></div><div class="field"><label>Código interno</label><input type="text" id="s-cod"></div></div>
         <div class="field" style="margin-bottom:16px"><label>Descripción</label><textarea id="s-desc"></textarea></div>
         <div class="form-row form-row-3"><div class="field"><label>Tipo</label><select id="s-tipo"><option>Comprado</option><option>Desarrollado internamente</option><option>Mixto</option></select></div><div class="field"><label>Versión</label><input type="text" id="s-ver"></div><div class="field"><label>Estado</label><select id="s-est"><option>Activo</option><option>En desarrollo</option><option>En migración</option><option>Obsoleto</option><option>Dado de baja</option></select></div></div>
         <div class="form-row form-row-2"><div class="field"><label>URL / Ruta</label><input type="text" id="s-url"></div><div class="field"><label>Tipo de acceso</label><select id="s-acc"><option>Web</option><option>Desktop</option><option>Mobile</option><option>API</option><option>Mixto</option></select></div></div>
@@ -783,6 +784,21 @@ tbody tr:last-child{border-bottom:none}
         <div class="form-row form-row-3"><div class="field"><label>¿Requiere EIPD?</label><select id="s-c1"><option>No</option><option>Sí</option><option>En evaluación</option></select></div><div class="field"><label>Estado EIPD</label><select id="s-c2"><option>No aplica</option><option>Pendiente</option><option>En proceso</option><option>Completada</option></select></div><div class="field"><label>¿Aviso privacidad publicado?</label><select id="s-c3"><option>No</option><option>Sí</option></select></div></div>
         <div class="form-row form-row-3"><div class="field"><label>Nivel de riesgo</label><select id="s-c4"><option>Bajo</option><option>Medio</option><option>Alto</option></select></div><div class="field"><label>¿Incluido en RAT?</label><select id="s-c5"><option>No</option><option>Sí</option><option>En proceso</option></select></div><div class="field"><label>Secretaría responsable</label><input type="text" id="s-c6"></div></div>
         <div class="field"><label>Observaciones</label><textarea id="s-c7"></textarea></div>
+      </div>
+      <div class="tab-panel" id="tab-st8">
+        <div style="font-size:12px;color:var(--gris);margin-bottom:14px">ℹ️ Datos importados automáticamente desde el Excel de Arquitectura del MDMQ. Solo lectura.</div>
+        <div class="section-divider">💻 Backend / Frontend</div>
+        <div id="arq-backend-view" style="margin-bottom:16px">
+          <div style="color:var(--gris);font-size:12px;font-style:italic">Sin datos de backend registrados</div>
+        </div>
+        <div class="section-divider">🗄️ Bases de Datos</div>
+        <div id="arq-bdd-view">
+          <div style="color:var(--gris);font-size:12px;font-style:italic">Sin bases de datos registradas</div>
+        </div>
+        <div class="section-divider">👥 Todos los Responsables del Sistema</div>
+        <div id="arq-resp-view">
+          <div style="color:var(--gris);font-size:12px;font-style:italic">Sin responsables adicionales registrados</div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1872,19 +1888,80 @@ function openModalSis(id){
   const s=id?sistemas.find(x=>x.id===id):null;
   document.getElementById('msis-title').textContent=s?'Editar Sistema':'Nuevo Sistema';
   document.getElementById('sis-id').value=s?s.id:'';
-  const flds=['rn','rc','rd','re','rt','ra','ran','nom','cod','desc','tipo','ver','est','url','acc','cam','bd','bdn','srv','pais','nube','amb','prueba','bkp','tdp','tit','ds','dst','vol','lic','cons','fin','sg1','sg2','sg3','sg4','sg5','sg6','pv1','pv2','pv3','pv4','pv5','pv6','pv7','c1','c2','c3','c4','c5','c6','c7'];
+  const flds=['rn','rc','rd','re','rt','ra','ran','nom','alias','cod','desc','tipo','ver','est','url','acc','cam','bd','bdn','srv','pais','nube','amb','prueba','bkp','tdp','tit','ds','dst','vol','lic','cons','fin','sg1','sg2','sg3','sg4','sg5','sg6','pv1','pv2','pv3','pv4','pv5','pv6','pv7','c1','c2','c3','c4','c5','c6','c7'];
   flds.forEach(f=>{const el=document.getElementById('s-'+f);if(el)el.value=s?s['s_'+f]||'':el.tagName==='SELECT'?el.options[0]?.value||'':'';});
   if(!s){const pisEl=document.getElementById('s-pais');if(pisEl)pisEl.value='Ecuador';}
+  // Renderizar tab Arquitectura
+  renderArqTab(s);
   document.querySelectorAll('#modal-sis .tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
   document.querySelectorAll('#modal-sis .tab-panel').forEach((p,i)=>p.classList.toggle('active',i===0));
   document.getElementById('modal-sis').classList.add('open');
 }
 window.openModalSis=openModalSis;
 
+function renderArqTab(s){
+  // Backend
+  const backendEl=document.getElementById('arq-backend-view');
+  const bddEl=document.getElementById('arq-bdd-view');
+  const respEl=document.getElementById('arq-resp-view');
+  const arq=(s&&s._arquitectura)||[];
+  const resps=(s&&s._responsables)||[];
+
+  // Backend
+  const backends=arq.filter(a=>!a.bdd||a.bdd==='');
+  if(backends.length){
+    backendEl.innerHTML=`<table style="font-size:12px;width:100%">
+      <thead><tr><th>Componente</th><th>Lenguaje</th><th>Framework</th></tr></thead>
+      <tbody>${backends.map(b=>`<tr>
+        <td><span class="badge badge-azul">${b.componente||'—'}</span></td>
+        <td>${b.lenguaje||'—'}</td>
+        <td>${b.framework||'—'}</td>
+      </tr>`).join('')}</tbody></table>`;
+  } else {
+    backendEl.innerHTML='<div style="color:var(--gris);font-size:12px;font-style:italic">Sin datos de backend registrados</div>';
+  }
+
+  // BDDs
+  const bdds=arq.filter(a=>a.bdd&&a.bdd!=='');
+  if(bdds.length){
+    bddEl.innerHTML=`<table style="font-size:12px;width:100%">
+      <thead><tr><th>Nombre de la Base de Datos</th><th>Motor</th><th>Versión / Lenguaje</th></tr></thead>
+      <tbody>${bdds.map(b=>`<tr>
+        <td style="font-weight:600;color:var(--azul)">${b.bdd||'—'}</td>
+        <td>${b.motor||'—'}</td>
+        <td><span class="badge badge-gris" style="font-size:10px">${b.version||'—'}</span></td>
+      </tr>`).join('')}</tbody></table>`;
+  } else {
+    bddEl.innerHTML='<div style="color:var(--gris);font-size:12px;font-style:italic">Sin bases de datos registradas</div>';
+  }
+
+  // Responsables
+  if(resps.length){
+    respEl.innerHTML=`<table style="font-size:12px;width:100%">
+      <thead><tr><th>Nombre</th><th>Rol</th><th>Correo</th><th>Teléfono</th><th>Estado</th></tr></thead>
+      <tbody>${resps.map(r=>`<tr>
+        <td style="font-weight:600">${r.nombre||'—'}</td>
+        <td><span class="badge badge-${r.rol==='ADMINISTRADOR FUNCIONAL'?'azul':'gris'}" style="font-size:10px">${r.rol||'—'}</span></td>
+        <td style="font-size:11px">${r.correo||'—'}</td>
+        <td style="font-size:11px">${r.tel||'—'}</td>
+        <td>${r.estado==='ACTIVO'?'<span class="badge badge-verde" style="font-size:10px">✅ Activo</span>':'<span class="badge badge-gris" style="font-size:10px">'+r.estado+'</span>'}</td>
+      </tr>`).join('')}</tbody></table>`;
+  } else {
+    respEl.innerHTML='<div style="color:var(--gris);font-size:12px;font-style:italic">Sin responsables adicionales registrados</div>';
+  }
+}
+window.renderArqTab=renderArqTab;
+
 async function saveSis(){
   const id=document.getElementById('sis-id').value||uid();
-  const data={upd:new Date().toISOString()};
-  ['rn','rc','rd','re','rt','ra','ran','nom','cod','desc','tipo','ver','est','url','acc','cam','bd','bdn','srv','pais','nube','amb','prueba','bkp','tdp','tit','ds','dst','vol','lic','cons','fin','sg1','sg2','sg3','sg4','sg5','sg6','pv1','pv2','pv3','pv4','pv5','pv6','pv7','c1','c2','c3','c4','c5','c6','c7'].forEach(f=>{const el=document.getElementById('s-'+f);if(el)data['s_'+f]=el.value;});
+  const existente=sistemas.find(x=>x.id===id);
+  const data={
+    upd:new Date().toISOString(),
+    // Preservar datos de arquitectura y responsables si existen
+    _arquitectura: existente?existente._arquitectura||[]:[],
+    _responsables: existente?existente._responsables||[]:[],
+  };
+  ['rn','rc','rd','re','rt','ra','ran','nom','alias','cod','desc','tipo','ver','est','url','acc','cam','bd','bdn','srv','pais','nube','amb','prueba','bkp','tdp','tit','ds','dst','vol','lic','cons','fin','sg1','sg2','sg3','sg4','sg5','sg6','pv1','pv2','pv3','pv4','pv5','pv6','pv7','c1','c2','c3','c4','c5','c6','c7'].forEach(f=>{const el=document.getElementById('s-'+f);if(el)data['s_'+f]=el.value;});
   if(!data.s_nom){alert('El nombre del sistema es obligatorio');return;}
   try{await window._set(window._doc(window._db,'sistemas',id),data);closeModal('modal-sis');await loadAll();renderSis();renderDashboard();}catch(e){alert('Error: '+e.message);}
 }
@@ -2910,34 +2987,68 @@ async function importarSistemasExcel(input){
     const buf = await file.arrayBuffer();
     const wb  = XLSX.read(buf, {type:'array', cellDates:true});
 
-    // ── Leer hoja DATOS ──────────────────────────────────────────────────
+    // ── Hoja DATOS ───────────────────────────────────────────────────────
     const wsDatos = wb.Sheets['DATOS'];
-    const wdRaw   = XLSX.utils.sheet_to_json(wsDatos, {header:1, defval:''});
     if(!wsDatos){ alert('No se encontró la hoja "DATOS" en el Excel'); return; }
+    const wdRaw = XLSX.utils.sheet_to_json(wsDatos, {header:1, defval:''});
 
-    // ── Leer hoja RESPONSABLES ───────────────────────────────────────────
-    const wsResp = wb.Sheets['RESPONSABLES'];
+    // ── Hoja RESPONSABLES ────────────────────────────────────────────────
+    const wsResp  = wb.Sheets['RESPONSABLES'];
     const respRaw = wsResp ? XLSX.utils.sheet_to_json(wsResp, {header:1, defval:''}) : [];
     const respMap = {};
     respRaw.slice(1).forEach(r => {
       const nom = String(r[0]||'').trim();
       if(!nom) return;
       if(!respMap[nom]) respMap[nom] = [];
-      respMap[nom].push({ nombre:String(r[2]||'').trim(), rol:String(r[3]||'').trim(), correo:String(r[4]||'').trim(), tel:String(r[5]||'').trim(), estado:String(r[6]||'').trim() });
+      respMap[nom].push({
+        nombre: String(r[2]||'').trim(),
+        rol:    String(r[3]||'').trim(),
+        correo: String(r[4]||'').trim(),
+        tel:    String(r[5]||'').trim(),
+        estado: String(r[6]||'').trim(),
+      });
     });
 
-    // ── Leer hoja ARQUITECTURA ───────────────────────────────────────────
-    const wsArq = wb.Sheets['ARQUITECTURA'];
+    // ── Hoja ARQUITECTURA — separar backend de BDDs ───────────────────────
+    const wsArq  = wb.Sheets['ARQUITECTURA'];
     const arqRaw = wsArq ? XLSX.utils.sheet_to_json(wsArq, {header:1, defval:''}) : [];
-    const arqMap = {};
+    const arqMap = {}; // { nombre: [{componente, lenguaje, framework, bdd, motor, version}] }
     arqRaw.slice(1).forEach(r => {
-      const nom = String(r[0]||'').trim();
+      const nom       = String(r[0]||'').trim();
       if(!nom) return;
+      const bddNombre = String(r[6]||'').trim();
+      const bddMotor  = String(r[8]||'').trim(); // FRAMEWORK BDD = motor real (ej: MICROSOFT SQL SERVER 2016)
+      const bddVer    = String(r[7]||'').trim(); // LENGUAJE BDD  = versión (ej: TS/SQL 2016)
+
       if(!arqMap[nom]) arqMap[nom] = [];
-      arqMap[nom].push({ componente:String(r[2]||'').trim(), lenguaje:String(r[3]||'').trim(), framework:String(r[4]||'').trim(), bdd:String(r[6]||'').trim(), lenguajeBDD:String(r[7]||'').trim(), frameworkBDD:String(r[8]||'').trim() });
+
+      if(bddNombre || bddMotor){
+        // Es una fila de base de datos
+        arqMap[nom].push({
+          componente: String(r[2]||'').trim(),
+          lenguaje:   '',
+          framework:  '',
+          bdd:        bddNombre,
+          motor:      bddMotor,
+          version:    bddVer,
+        });
+      } else {
+        // Es una fila de backend/frontend
+        const lenguaje = String(r[3]||'').trim();
+        if(lenguaje && lenguaje !== 'Sin tecnologías registradas'){
+          arqMap[nom].push({
+            componente: String(r[2]||'').trim(),
+            lenguaje:   lenguaje,
+            framework:  String(r[4]||'').trim(),
+            bdd:        '',
+            motor:      '',
+            version:    '',
+          });
+        }
+      }
     });
 
-    // ── Construir objetos por sistema ────────────────────────────────────
+    // ── Construir e importar sistemas ────────────────────────────────────
     const filas = wdRaw.slice(1).filter(r => String(r[0]||'').trim());
     const total = filas.length;
     let ok=0, errores=[];
@@ -2945,68 +3056,83 @@ async function importarSistemasExcel(input){
     statusEl.textContent = `⏳ Importando 0 / ${total} sistemas...`;
 
     for(let i=0; i<filas.length; i++){
-      const r = filas[i];
+      const r      = filas[i];
       const nombre = String(r[0]||'').trim();
+      const alias  = String(r[1]||'').trim();
 
-      // Responsable principal
-      const resps = respMap[nombre] || [];
-      const admin = resps.find(x => x.rol === 'ADMINISTRADOR FUNCIONAL') || resps[0] || {};
+      const resps  = respMap[nombre] || [];
+      const admin  = resps.find(x => x.rol === 'ADMINISTRADOR FUNCIONAL') || resps[0] || {};
+      const arq    = arqMap[nombre]  || [];
+
+      // Extraer primera BDD para los campos de Infraestructura
+      const primeraBDD = arq.find(a => a.bdd && a.bdd !== '');
+      // Deducir motor normalizado para el select
+      let motorNorm = 'Otro';
+      if(primeraBDD){
+        const m = (primeraBDD.motor||'').toUpperCase();
+        if(m.includes('SQL SERVER'))    motorNorm = 'SQL Server';
+        else if(m.includes('POSTGRESQL') || m.includes('PL/PGSQL')) motorNorm = 'PostgreSQL';
+        else if(m.includes('ORACLE') || m.includes('PL/SQL'))       motorNorm = 'Oracle';
+        else if(m.includes('MYSQL'))    motorNorm = 'MySQL';
+        else if(m.includes('MONGODB'))  motorNorm = 'MongoDB';
+        else if(m.includes('MARIADB'))  motorNorm = 'MySQL';
+      }
 
       const data = {
-        s_nom:  nombre,
-        s_alias:String(r[1]||'').trim(),
-        s_ver:  String(r[2]||'').trim(),
-        s_tipo: 'Aplicativo web',
-        s_prov: String(r[4]||'').trim(),
-        s_fecha:String(r[5]||'').trim(),
-        s_c6:   String(r[6]||'').trim(),   // Secretaría/Dependencia dueña
-        s_desc: String(r[7]||'').trim(),
+        s_nom:   nombre,
+        s_alias: alias,
+        s_ver:   String(r[2]||'').trim(),
+        s_tipo:  'Aplicativo web',
+        s_prov:  String(r[4]||'').trim(),
+        s_fecha: String(r[5]||'').trim(),
+        s_c6:    String(r[6]||'').trim(),
+        s_desc:  String(r[7]||'').trim(),
         // Responsable principal
         s_rn: admin.nombre || '',
         s_re: admin.correo || '',
         s_rt: admin.tel    || '',
+        // Infraestructura — rellenar desde arquitectura
+        s_bd:  motorNorm,
+        s_bdn: primeraBDD ? primeraBDD.bdd : '',
+        s_pais:'Ecuador',
         // Campos PDP — a completar en la herramienta
         s_tdp:'Sí', s_ds:'No', s_dst:'', s_vol:'No determinado',
         s_lic:'Interés público', s_cons:'', s_fin:'',
         s_sg1:'No', s_sg2:'No', s_sg3:'No', s_sg4:'No', s_sg5:'No', s_sg6:'No evaluado',
         s_pv1:'No', s_pv2:'', s_pv3:'', s_pv4:'No aplica', s_pv5:'No aplica', s_pv6:'', s_pv7:'No',
-        s_c1:'No', s_c2:'No aplica', s_c3:'No', s_c4:'Bajo', s_c5:'No',
-        s_pais:'Ecuador', s_prueba:'No',
-        // Datos extra del Excel (visible en modal, tab descripción)
+        s_c1:'No', s_c2:'No aplica', s_c3:'No', s_c4:'Bajo', s_c5:'No', s_prueba:'No',
+        // Datos completos de arquitectura y responsables (para tab Arquitectura)
+        _arquitectura: arq,
         _responsables: resps,
-        _arquitectura: arqMap[nombre] || [],
         upd: new Date().toISOString(),
       };
 
-      // ID basado en el alias o nombre limpio para evitar duplicados
-      const id = 'sis_' + (data.s_alias || nombre).toLowerCase()
-        .replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').substr(0,30)
-        + '_' + i;
+      const id = 'sis_' + (alias || nombre).toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').substr(0,28)
+        + '_' + String(i).padStart(2,'0');
 
       try {
         await window._set(window._doc(window._db, 'sistemas', id), data);
         ok++;
-        statusEl.textContent = `⏳ Importando ${ok} / ${total} sistemas...`;
+        if(ok % 5 === 0) statusEl.textContent = `⏳ Importando ${ok} / ${total}...`;
       } catch(e) {
         errores.push(nombre + ': ' + e.message);
       }
     }
 
-    // Recargar datos
     await loadAll();
     renderSis();
     renderDashboard();
 
     if(errores.length){
-      statusEl.textContent = `⚠️ ${ok}/${total} importados. ${errores.length} errores.`;
+      statusEl.textContent = `⚠️ ${ok}/${total} importados. ${errores.length} con error.`;
       statusEl.style.color = 'var(--naranja)';
-      console.error('Errores importación:', errores);
+      console.error('Errores:', errores);
     } else {
-      statusEl.textContent = `✅ ${ok} sistemas importados correctamente`;
+      statusEl.textContent = `✅ ${ok} sistemas importados — alias, arquitectura y BDDs incluidos`;
       statusEl.style.color = 'var(--verde)';
     }
-
-    // Limpiar el input para poder reimportar
     input.value = '';
 
   } catch(e) {
