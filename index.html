@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIPD-MDMQ v4 — Sistema de Protección de Datos</title>
+<title>SIPD-MDMQ — Sistema de Implementación de Protección de Datos Personales</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
   --azul:#1B3A6B;--azul-medio:#2E5FA3;--azul-claro:#4A90D9;--azul-bg:#EBF3FB;
@@ -282,7 +283,7 @@ tbody tr:last-child{border-bottom:none}
     <div class="login-logo">
       <div class="escudo">🛡️</div>
       <h1>SIPD-MDMQ</h1>
-      <p>Sistema de Protección de Datos Personales<br>Municipio del Distrito Metropolitano de Quito<br><span style="color:#22C55E;font-size:11px;font-weight:700">✅ VERSIÓN EXCEL — Abr 2026</span></p>
+      <p>Sistema de Implementación de Protección de Datos Personales<br>Municipio del Distrito Metropolitano de Quito</p>
     </div>
     <div class="form-group">
       <label>Correo electrónico</label>
@@ -313,6 +314,7 @@ tbody tr:last-child{border-bottom:none}
       </div>
       <div class="nav-section">
         <div class="nav-section-label">Gestión</div>
+        <button class="nav-item" onclick="showPage('institucional',this)"><span class="icon">🧩</span>Institucional (MDMQ)</button>
         <button class="nav-item" onclick="showPage('dependencias',this)"><span class="icon">🏛️</span>Dependencias</button>
         <button class="nav-item" onclick="showPage('empresas',this)"><span class="icon">🏢</span>Empresas Públicas</button>
         <button class="nav-item" onclick="showPage('sistemas',this)"><span class="icon">💻</span>Inventario Sistemas</button>
@@ -395,6 +397,11 @@ tbody tr:last-child{border-bottom:none}
         </div>
       </div>
 
+      <!-- INSTITUCIONAL -->
+      <div class="page" id="page-institucional">
+        <div id="inst-content"></div>
+      </div>
+
       <!-- DEPENDENCIAS -->
       <div class="page" id="page-dependencias">
         <div class="filter-bar">
@@ -453,6 +460,7 @@ tbody tr:last-child{border-bottom:none}
           <input type="text" id="reu-search" placeholder="🔍 Buscar reunión..." oninput="renderReuniones()">
           <select id="reu-f-tipo" onchange="renderReuniones()"><option value="">Todos los tipos</option><option>General</option><option>Por dependencia</option><option>Por grupo</option><option>Con Empresa Pública</option></select>
           <select id="reu-f-imp" onchange="renderReuniones()"><option value="">Todos los implementadores</option></select>
+          <button class="btn btn-secondary" onclick="expReuX()">📊 Excel</button>
           <button class="btn btn-primary" onclick="openModalReu(null)">➕ Nueva Reunión</button>
         </div>
         <div id="reu-list"></div>
@@ -516,7 +524,7 @@ tbody tr:last-child{border-bottom:none}
             <button class="btn btn-sm btn-secondary" onclick="exportGAP()">📥 Exportar CSV</button>
           </div>
           <div class="card-body">
-            <p style="font-size:13px;color:var(--gris);margin-bottom:16px">Selecciona una dependencia para ver su diagnóstico completo de brechas (GAP) según los 16 componentes del SIPD y la normativa aplicable.</p>
+            <p style="font-size:13px;color:var(--gris);margin-bottom:16px">Selecciona una dependencia para ver su diagnóstico completo de brechas (GAP) según los 15 componentes del SIPD y la normativa aplicable.</p>
             <div class="form-row form-row-2">
               <div class="field"><label>Seleccionar Dependencia</label><select id="gap-dep-sel" onchange="renderGAP()"><option value="">-- Selecciona una dependencia --</option></select></div>
               <div class="field"><label>Vista</label><select id="gap-vista" onchange="renderGAP()"><option value="todos">Todos los componentes</option><option value="pendientes">Solo pendientes / en proceso</option><option value="completados">Solo completados</option></select></div>
@@ -553,12 +561,14 @@ tbody tr:last-child{border-bottom:none}
       <div class="page" id="page-reportes">
         <div class="tabs">
           <button class="tab-btn active" onclick="showTab('r-general',this)">📊 General</button>
+          <button class="tab-btn" onclick="showTab('r-jerarquia',this)">🌳 Jerarquía</button>
           <button class="tab-btn" onclick="showTab('r-deps',this)">🏛️ Dependencias</button>
           <button class="tab-btn" onclick="showTab('r-sis',this)">💻 Sistemas</button>
           <button class="tab-btn" onclick="showTab('r-alertas',this)">⚠️ Alertas</button>
           <button class="tab-btn" onclick="showTab('r-equipo',this)">👥 Por Implementador</button>
         </div>
         <div class="tab-panel active" id="tab-r-general"><div id="rep-general"></div></div>
+        <div class="tab-panel" id="tab-r-jerarquia"><div id="rep-jerarquia"></div></div>
         <div class="tab-panel" id="tab-r-deps"><div id="rep-deps"></div></div>
         <div class="tab-panel" id="tab-r-sis"><div id="rep-sis"></div></div>
         <div class="tab-panel" id="tab-r-alertas"><div id="rep-alertas"></div></div>
@@ -602,7 +612,7 @@ tbody tr:last-child{border-bottom:none}
           <div class="field"><label>Edificio / Oficina</label><input type="text" id="dep-fb"></div>
         </div>
       </div>
-      <div class="section-divider">✅ 16 Componentes SIPD</div>
+      <div class="section-divider">✅ 15 Componentes SIPD</div>
       <p style="font-size:12px;color:var(--gris);margin-bottom:12px">Marca si aplica y selecciona el estado actual:</p>
       <div id="comp-form" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
       <div class="section-divider">📝 Observaciones</div>
@@ -724,6 +734,13 @@ tbody tr:last-child{border-bottom:none}
         <div class="field"><label>Fecha próxima reunión</label><input type="date" id="reu-proxima"></div>
         <div class="field"><label>Responsable seguimiento</label><select id="reu-responsable"><option value="">Sin asignar</option></select></div>
       </div>
+      <div class="section-divider">📎 Acta de reunión</div>
+      <div class="field" style="margin-bottom:8px">
+        <label>Adjuntar acta (imagen JPG/PNG o PDF — máx. 10 MB)</label>
+        <input type="file" id="reu-acta-file" accept="image/*,application/pdf" onchange="onActaSelect()" style="width:100%;padding:10px;border:2px dashed var(--borde);border-radius:10px;font-size:13px;cursor:pointer">
+      </div>
+      <div id="reu-acta-actual" style="display:none;align-items:center;gap:10px;padding:10px 14px;background:var(--azul-bg);border-radius:10px;font-size:13px;margin-bottom:8px"></div>
+      <div id="reu-acta-progress" style="display:none;font-size:12px;color:var(--azul-medio);margin-bottom:8px">⏳ Subiendo acta…</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-reu')">Cancelar</button>
@@ -921,10 +938,12 @@ tbody tr:last-child{border-bottom:none}
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,collection,getDocs,doc,setDoc,deleteDoc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getStorage,ref as sRef,uploadBytes,getDownloadURL,deleteObject}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const cfg={apiKey:"AIzaSyCsyb7V4Bgee0uCXkVYl12VPP5bnqak_XI",authDomain:"implementacion-mdmq.firebaseapp.com",projectId:"implementacion-mdmq",storageBucket:"implementacion-mdmq.firebasestorage.app",messagingSenderId:"104720286448",appId:"1:104720286448:web:2ebc7be791593b82927835"};
-const app=initializeApp(cfg);const auth=getAuth(app);const db=getFirestore(app);
+const app=initializeApp(cfg);const auth=getAuth(app);const db=getFirestore(app);const storage=getStorage(app);
 window._auth=auth;window._db=db;window._signIn=signInWithEmailAndPassword;window._signOut=signOut;
 window._col=collection;window._getDocs=getDocs;window._doc=doc;window._set=setDoc;window._del=deleteDoc;window._update=updateDoc;
+window._storage=storage;window._sRef=sRef;window._uploadBytes=uploadBytes;window._getDownloadURL=getDownloadURL;window._deleteObject=deleteObject;
 onAuthStateChanged(auth,u=>{
   if(u){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='flex';
   const n=u.email.split('@')[0];document.getElementById('user-name').textContent=u.email;document.getElementById('user-avatar').textContent=n[0].toUpperCase();initApp();}
@@ -936,22 +955,62 @@ onAuthStateChanged(auth,u=>{
 // ======== CONSTANTES ========
 const COMPONENTES=[
   {id:'punto_focal',n:'Punto Focal designado',i:'👤'},
-  {id:'inventario_datos',n:'Inventario de datos personales',i:'📦'},
   {id:'matriz_cat',n:'Matriz de categorización de datos',i:'🗂️'},
   {id:'rat',n:'Registro de Actividades de Tratamiento (RAT)',i:'📋'},
   {id:'politica',n:'Política de protección de datos',i:'📜'},
   {id:'avisos',n:'Avisos / Notas de privacidad',i:'📢'},
-  {id:'consentimientos',n:'Consentimientos',i:'✍️'},
+  {id:'terminos_cond',n:'Términos y condiciones (Web/App)',i:'📃'},
+  {id:'consentimientos',n:'Consentimientos / Autorizaciones de tratamiento',i:'✍️'},
+  {id:'clausulas_fisicas',n:'Cláusulas en recolección física',i:'🖊️'},
+  {id:'contratos_laborales',n:'Contratos laborales actualizados',i:'👔'},
   {id:'confidencialidad',n:'Compromisos de confidencialidad',i:'🔒'},
   {id:'capacitacion',n:'Capacitación al personal',i:'🎓'},
   {id:'inv_sistemas',n:'Inventario de sistemas informáticos',i:'💻'},
+  {id:'matriz_riesgos',n:'Matriz de riesgos',i:'📈'},
   {id:'eipd',n:'Evaluación de Impacto (EIPD)',i:'⚖️'},
-  {id:'contratos_enc',n:'Contratos con encargados del tratamiento',i:'🤝'},
   {id:'protocolo_arco',n:'Protocolo atención derechos ARCO+',i:'⚡'},
   {id:'plan_incidentes',n:'Plan de respuesta a incidentes',i:'🚨'},
+  {id:'inv_proveedores',n:'Inventario de proveedores',i:'📒'},
+  {id:'contratos_enc',n:'Contratos con encargados (DPA)',i:'🤝'},
+  {id:'acuerdos_conjuntos',n:'Acuerdos de responsables conjuntos',i:'📑'},
+  {id:'auditoria_prov',n:'Auditoría a proveedores',i:'🔎'},
   {id:'transf_int',n:'Transferencias internacionales de datos',i:'🌐'},
+  {id:'minimizacion',n:'Minimización de datos',i:'➖'},
+  {id:'controles_acceso',n:'Controles de acceso',i:'🔑'},
+  {id:'ciclo_seguro',n:'Ciclo de desarrollo seguro',i:'🛠️'},
+  {id:'seudonimizacion',n:'Seudonimización / Cifrado',i:'🔐'},
   {id:'baja_datos',n:'Procedimiento de baja / supresión de datos',i:'🗑️'},
+  {id:'programa_auditorias',n:'Programa de auditorías',i:'📅'},
+  {id:'plan_auditorias',n:'Plan de auditorías',i:'🗒️'},
+  {id:'ejecucion_auditorias',n:'Ejecución de auditorías internas',i:'✔️'},
+  {id:'repositorio_evidencias',n:'Repositorio de evidencias',i:'🗄️'},
 ];
+
+// Componentes INSTITUCIONALES (nivel MDMQ / Administración General — se cumplen una sola vez)
+const INST_COMP=[
+  {id:'eval_obligatoriedad_dpd',n:'Evaluación de obligatoriedad del DPD',i:'📄'},
+  {id:'designacion_dpd',n:'Designación e independencia del DPD',i:'👤'},
+  {id:'registro_spdp',n:'Registro del DPD ante la SPDP',i:'🏛️'},
+  {id:'procedimiento_gestion',n:'Procedimiento/modelo de gestión del SPDP',i:'🔄'},
+  {id:'formatos_modelo',n:'Formatos modelo (avisos, autorizaciones, DPA, acuerdos, convenios)',i:'📁'},
+  {id:'metodologia_riesgos',n:'Metodología de análisis y tratamiento de riesgos',i:'🧮'},
+];
+const INST_NORM={
+  eval_obligatoriedad_dpd:'Art. 47 LOPDP — Obligatoriedad de designación del DPD',
+  designacion_dpd:'Art. 47-48 LOPDP — Delegado de Protección de Datos',
+  registro_spdp:'Art. 47 LOPDP — Registro del DPD ante la SPDP',
+  procedimiento_gestion:'Art. 11 LOPDP — Responsabilidad proactiva',
+  formatos_modelo:'Art. 12-13 LOPDP — Información y transparencia',
+  metodologia_riesgos:'Art. 37-40 LOPDP — Seguridad de datos personales',
+};
+const INST_ACC={
+  eval_obligatoriedad_dpd:'Documentar formalmente si el MDMQ está obligado a designar DPD (sector público / gran escala / datos sensibles)',
+  designacion_dpd:'Designar formalmente al DPD, garantizando independencia y ausencia de conflictos de interés (no OSI / no gerencial)',
+  registro_spdp:'Registrar oficialmente el nombramiento del DPD ante la Superintendencia de Protección de Datos Personales',
+  procedimiento_gestion:'Elaborar el procedimiento/modelo de gestión del sistema de protección de datos personales del MDMQ',
+  formatos_modelo:'Crear los formatos institucionales: avisos de privacidad, autorizaciones, contratos de encargo, acuerdos de responsables conjuntos y convenios de transferencia',
+  metodologia_riesgos:'Definir la metodología institucional para identificar amenazas y vulnerabilidades a partir de los RAT',
+};
 
 const EP_COMP=[
   {id:'delegado_id',n:'Delegado de PDP identificado y con contacto',i:'👤'},
@@ -975,7 +1034,6 @@ let modalSubtareas=[];
 // GAP normativa por componente
 const GAP_NORM={
   punto_focal:'Art. 22 LOPDP — Reglamento DPD Art. 3 y ss.',
-  inventario_datos:'Art. 13, 22 LOPDP — Principio de transparencia',
   matriz_cat:'Art. 26 LOPDP — Categorías especiales — Guía SPDP de categorización',
   rat:'Art. 22 lit. a LOPDP — Art. 30 Reglamento General',
   politica:'Art. 10 lit. j LOPDP — Principio de responsabilidad proactiva',
@@ -990,12 +1048,26 @@ const GAP_NORM={
   plan_incidentes:'Art. 37-40 LOPDP — Notificación de incidentes (72h)',
   transf_int:'Art. 47-55 LOPDP — Transferencias internacionales',
   baja_datos:'Art. 66-69 LOPDP — Derecho de supresión',
+  terminos_cond:'Art. 12-13 LOPDP — Información y transparencia al titular',
+  clausulas_fisicas:'Art. 13 LOPDP — Deber de información en la recolección',
+  contratos_laborales:'Art. 26 LOPDP — Datos sensibles (biometría/videovigilancia) en relación laboral',
+  matriz_riesgos:'Art. 37-40 LOPDP — Seguridad: confidencialidad, integridad y disponibilidad',
+  inv_proveedores:'Art. 41-46 LOPDP — Encargados del tratamiento',
+  acuerdos_conjuntos:'Art. 41-46 LOPDP — Corresponsables del tratamiento',
+  auditoria_prov:'Art. 41-46 LOPDP — Verificación de garantías del encargado',
+  minimizacion:'Art. 10 lit. c / Art. 40 LOPDP — Minimización y privacidad por defecto',
+  controles_acceso:'Art. 37-40 LOPDP — Medidas de seguridad (mínimo privilegio)',
+  ciclo_seguro:'Art. 40 LOPDP — Privacidad desde el diseño y por defecto',
+  seudonimizacion:'Art. 4 num. 26 / Art. 40 LOPDP — Seudonimización y cifrado',
+  programa_auditorias:'Art. 11 LOPDP — Responsabilidad proactiva (control y auditoría)',
+  plan_auditorias:'Art. 11 LOPDP — Responsabilidad proactiva (control y auditoría)',
+  ejecucion_auditorias:'Art. 11 LOPDP — Medición de madurez y cumplimiento',
+  repositorio_evidencias:'Art. 11 LOPDP — Demostración del cumplimiento (accountability)',
 };
 
 const GAP_ACC={
   punto_focal:'Designar formalmente mediante memorando / resolución y notificar a la SPDP',
-  inventario_datos:'Levantar inventario con: tipo de dato, sistema, finalidad, base licitud, tiempo conservación',
-  matriz_cat:'Clasificar datos según Art. 26 LOPDP: ordinarios / sensibles / especialmente protegidos',
+  matriz_cat:'Levantar y clasificar las bases de datos según Art. 26 LOPDP: datos ordinarios / sensibles / especialmente protegidos, indicando sistema, finalidad, base de licitud y tiempo de conservación',
   rat:'Completar el RAT institucional con todas las actividades de tratamiento de la dependencia',
   politica:'Elaborar y aprobar política institucional de protección de datos personales',
   avisos:'Publicar aviso/nota de privacidad en todos los formularios y canales de recolección de datos',
@@ -1009,10 +1081,26 @@ const GAP_ACC={
   plan_incidentes:'Elaborar plan de respuesta a incidentes con protocolo de notificación en 72h a la SPDP',
   transf_int:'Verificar transferencias internacionales y obtener garantías adecuadas (Art. 47 LOPDP)',
   baja_datos:'Establecer procedimiento formal para baja y supresión de datos personales',
+  terminos_cond:'Publicar términos y condiciones accesibles y en lenguaje claro en web/app',
+  clausulas_fisicas:'Incluir cláusulas informativas en todos los formularios físicos de recolección',
+  contratos_laborales:'Actualizar contratos laborales con cláusulas sobre biometría, videovigilancia y nómina',
+  matriz_riesgos:'Realizar el análisis de confidencialidad, integridad y disponibilidad a partir de los RAT',
+  inv_proveedores:'Identificar todos los proveedores/terceros con acceso a datos personales',
+  acuerdos_conjuntos:'Firmar acuerdos que delimiten responsabilidades con corresponsables del tratamiento',
+  auditoria_prov:'Exigir y verificar evidencia de seguridad a los proveedores',
+  minimizacion:'Asegurar que los sistemas recolecten solo los datos estrictamente necesarios',
+  controles_acceso:'Aplicar el principio de mínimo privilegio en los accesos a datos personales',
+  ciclo_seguro:'Aplicar salvaguardas (DevPrivOps) desde el diseño de nuevos sistemas y adquisiciones',
+  seudonimizacion:'Aplicar técnicas de seudonimización/cifrado/enmascaramiento en las bases de datos',
+  programa_auditorias:'Contar con el programa anual de auditorías de protección de datos de la dependencia',
+  plan_auditorias:'Disponer del plan detallado de la auditoría a ejecutar en un período específico',
+  ejecucion_auditorias:'Ejecutar la auditoría interna para medir la madurez real del cumplimiento',
+  repositorio_evidencias:'Mantener la carpeta de evidencias lista para inspección de la SPDP',
 };
 
 // ======== DATA ========
 let deps=[],eps=[],sistemas=[],reuniones=[],implementadores=[];
+let institucional={id:'mdmq',comp:{}};
 let currentPage='dashboard';
 
 document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('es-EC',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -1032,12 +1120,13 @@ window.doLogout=doLogout;
 async function initApp(){
   await loadAll();
   renderEquipo();renderDeps();renderEPs();renderSis();renderReuniones();
-  renderDashboard();renderOrg();renderGAPSelect();renderEntrevista();renderReportes();renderTareas();
+  renderDashboard();renderOrg();renderGAPSelect();renderEntrevista();renderReportes();renderTareas();renderInstitucional();
 }
 
 async function loadAll(){
   const load=async(col)=>{try{const s=await window._getDocs(window._col(window._db,col));return s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){console.error(e);return[];}};
   [deps,eps,sistemas,reuniones,implementadores,tareas]=await Promise.all([load('dependencias'),load('empresas_publicas'),load('sistemas'),load('reuniones'),load('implementadores'),load('tareas')]);
+  const _inst=await load('institucional');institucional=_inst.find(x=>x.id==='mdmq')||_inst[0]||{id:'mdmq',comp:{}};if(!institucional.comp)institucional.comp={};
 }
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2);}
@@ -1046,6 +1135,7 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(
 const PAGES={
   dashboard:['Dashboard','Resumen ejecutivo del SIPD'],
   organigrama:['Organigrama MDMQ','Estructura organizacional completa'],
+  institucional:['Cumplimiento Institucional (MDMQ)','Componentes a nivel de Administración General'],
   dependencias:['Dependencias','Gestión de dependencias y puntos focales'],
   empresas:['Empresas Públicas Metropolitanas','Coordinación con delegados de PDP'],
   sistemas:['Inventario de Sistemas','Registro de sistemas informáticos'],
@@ -1080,15 +1170,17 @@ function showTab(id,el){
 window.showTab=showTab;
 
 // ======== HELPERS ========
+// Un componente "aplica" si no está marcado como 'No aplica' (compatible con datos antiguos que usaban el toggle aplica=false)
+function aplicaC(o){return !!o && o.aplica!==false && o.s!=='No aplica';}
 function calcPct(dep){
   if(!dep.comp)return-1;
-  const ap=COMPONENTES.filter(c=>dep.comp[c.id]&&dep.comp[c.id].aplica);
+  const ap=COMPONENTES.filter(c=>aplicaC(dep.comp[c.id]));
   if(!ap.length)return-1;
   return Math.round(ap.filter(c=>dep.comp[c.id].s==='Completado').length/ap.length*100);
 }
 function calcEPPct(ep){
   if(!ep.comp)return-1;
-  const ap=EP_COMP.filter(c=>ep.comp[c.id]&&ep.comp[c.id].aplica);
+  const ap=EP_COMP.filter(c=>aplicaC(ep.comp[c.id]));
   if(!ap.length)return-1;
   return Math.round(ap.filter(c=>ep.comp[c.id].s==='Completado').length/ap.length*100);
 }
@@ -1113,7 +1205,8 @@ function renderDashboard(){
     <div class="stat-card"><div class="stat-icon" style="background:#EBF3FB">🏛️</div><div class="stat-info"><div class="value">${tDep}</div><div class="label">Dependencias registradas</div></div></div>
     <div class="stat-card"><div class="stat-icon" style="background:#EDE9FE">🏢</div><div class="stat-info"><div class="value">${tEP}</div><div class="label">Empresas Públicas</div></div></div>
     <div class="stat-card"><div class="stat-icon" style="background:#EBF3FB">💻</div><div class="stat-info"><div class="value">${tSis}</div><div class="label">Sistemas registrados</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:${avg>=70?'#E6F4EE':avg>=30?'#FFF0E0':'#FEE2E2'}">${avg>=70?'✅':avg>=30?'⚠️':'🔴'}</div><div class="stat-info"><div class="value" style="color:${pColor(avg)}">${avg}%</div><div class="label">Avance promedio SIPD</div></div></div>`;
+    <div class="stat-card"><div class="stat-icon" style="background:${avg>=70?'#E6F4EE':avg>=30?'#FFF0E0':'#FEE2E2'}">${avg>=70?'✅':avg>=30?'⚠️':'🔴'}</div><div class="stat-info"><div class="value" style="color:${pColor(avg)}">${avg}%</div><div class="label">Avance promedio SIPD</div></div></div>
+    <div class="stat-card" onclick="showPage('institucional',document.querySelector('.nav-item[onclick*=institucional]'))" style="cursor:pointer"><div class="stat-icon" style="background:#EBF3FB">🧩</div><div class="stat-info"><div class="value" style="color:${pColor(instPct())}">${instPct()}%</div><div class="label">Avance institucional (MDMQ)</div></div></div>`;
 
   // Avance deps
   let av='';
@@ -1143,7 +1236,7 @@ function renderDashboard(){
     th+=`<tr><td style="font-weight:600;font-size:11px;white-space:nowrap">${d.nombre.length>30?d.nombre.substr(0,30)+'…':d.nombre}</td>`;
     COMPONENTES.forEach(c=>{
       const co=d.comp&&d.comp[c.id];
-      if(!co||!co.aplica){th+=`<td style="text-align:center;color:#CBD5E1;font-size:12px">—</td>`;}
+      if(!aplicaC(co)){th+=`<td style="text-align:center;color:#CBD5E1;font-size:12px">—</td>`;}
       else{th+=`<td style="text-align:center"><span class="semaforo sem-${SC[co.s]||'gris'}" title="${co.s}"></span></td>`;}
     });
     th+=`<td style="font-weight:700;color:${p<0?'var(--gris)':pColor(p)}">${p<0?'N/A':p+'%'}</td></tr>`;
@@ -1486,7 +1579,7 @@ function renderDeps(){
   if(!filtered.length){c.innerHTML='<div class="empty-state"><div class="icon">🏛️</div><h4>Sin dependencias</h4><p>Usa "Nueva Dependencia" para empezar</p></div>';return;}
   c.innerHTML=filtered.map(d=>{
     const p=calcPct(d);const col=semC(p);
-    const ap=COMPONENTES.filter(c=>d.comp&&d.comp[c.id]&&d.comp[c.id].aplica).length;
+    const ap=COMPONENTES.filter(c=>aplicaC(d.comp&&d.comp[c.id])).length;
     const ok=COMPONENTES.filter(c=>d.comp&&d.comp[c.id]&&d.comp[c.id].s==='Completado').length;
     return`<div class="card" style="margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--borde);flex-wrap:wrap;gap:8px">
@@ -1502,7 +1595,7 @@ function renderDeps(){
         </div>
       </div>
       <div style="padding:12px 20px;display:flex;gap:6px;flex-wrap:wrap">
-        ${COMPONENTES.map(cc=>{const co=d.comp&&d.comp[cc.id];if(!co||!co.aplica)return`<span title="${cc.n}" style="opacity:.3;font-size:14px">${cc.i}</span>`;return`<span title="${cc.n}: ${co.s}" style="position:relative;font-size:14px">${cc.i}<span class="semaforo sem-${SC[co.s]||'gris'}" style="position:absolute;top:-2px;right:-2px;width:8px;height:8px"></span></span>`;}).join('')}
+        ${COMPONENTES.map(cc=>{const co=d.comp&&d.comp[cc.id];if(!aplicaC(co))return`<span title="${cc.n}" style="opacity:.3;font-size:14px">${cc.i}</span>`;return`<span title="${cc.n}: ${co.s}" style="position:relative;font-size:14px">${cc.i}<span class="semaforo sem-${SC[co.s]||'gris'}" style="position:absolute;top:-2px;right:-2px;width:8px;height:8px"></span></span>`;}).join('')}
       </div>
       ${d.tieneFocal?`<div style="padding:6px 20px 12px;font-size:11px;color:var(--gris);display:flex;gap:16px;flex-wrap:wrap">
         <span>👤 ${d.focal_n||'—'}</span><span>📧 ${d.focal_e||'—'}</span><span>📞 ${d.focal_t||'—'}</span>
@@ -1532,7 +1625,7 @@ function openFichaDep(d){
         <div><strong>Edificio:</strong> ${d.focal_b||'—'}</div>
       </div>`:'<div class="alert alert-danger">⚠️ Sin Punto Focal designado</div>'}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        ${COMPONENTES.map(cc=>{const co=d.comp&&d.comp[cc.id];if(!co||!co.aplica)return`<div style="padding:8px 12px;background:var(--gris-claro);border-radius:8px;font-size:11px;opacity:.5;display:flex;align-items:center;gap:6px">${cc.i} ${cc.n} <span style="margin-left:auto">N/A</span></div>`;return`<div style="padding:8px 12px;background:white;border:1px solid var(--borde);border-radius:8px;font-size:11px;display:flex;align-items:center;gap:6px"><span>${cc.i}</span><span style="flex:1">${cc.n}</span><span class="semaforo sem-${SC[co.s]||'gris'}"></span><span style="font-weight:600;font-size:10px">${co.s}</span></div>`;}).join('')}
+        ${COMPONENTES.map(cc=>{const co=d.comp&&d.comp[cc.id];if(!aplicaC(co))return`<div style="padding:8px 12px;background:var(--gris-claro);border-radius:8px;font-size:11px;opacity:.5;display:flex;align-items:center;gap:6px">${cc.i} ${cc.n} <span style="margin-left:auto">N/A</span></div>`;return`<div style="padding:8px 12px;background:white;border:1px solid var(--borde);border-radius:8px;font-size:11px;display:flex;align-items:center;gap:6px"><span>${cc.i}</span><span style="flex:1">${cc.n}</span><span class="semaforo sem-${SC[co.s]||'gris'}"></span><span style="font-weight:600;font-size:10px">${co.s}</span></div>`;}).join('')}
       </div>
       ${d.obs?`<div style="margin-top:14px;padding:12px;background:var(--naranja-bg);border-radius:10px;font-size:12px"><strong>📝</strong> ${d.obs}</div>`:''}
     </div>
@@ -1570,10 +1663,10 @@ function openModalDep(id,nombrePre){
   // componentes
   document.getElementById('comp-form').innerHTML=COMPONENTES.map(cc=>{
     const co=d&&d.comp&&d.comp[cc.id];
-    const aplica=co?co.aplica:true;const st=co?co.s||'Pendiente':'Pendiente';
+    const st=co?(co.aplica===false?'No aplica':(co.s||'Pendiente')):'Pendiente';
     return`<div style="padding:10px 12px;background:var(--gris-claro);border-radius:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <label class="toggle"><input type="checkbox" id="ca-${cc.id}" ${aplica?'checked':''}><span class="toggle-slider"></span></label>
+        <span class="semaforo sem-${SC[st]||'gris'}"></span>
         <span style="font-size:11px;font-weight:600">${cc.i} ${cc.n}</span>
       </div>
       <select class="select-status" id="cs-${cc.id}">${STATUS.map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>
@@ -1589,7 +1682,7 @@ window.toggleFocal=toggleFocal;
 async function saveDep(){
   const id=document.getElementById('dep-id').value||uid();
   const comp={};
-  COMPONENTES.forEach(cc=>{comp[cc.id]={aplica:document.getElementById('ca-'+cc.id).checked,s:document.getElementById('cs-'+cc.id).value};});
+  COMPONENTES.forEach(cc=>{const s=document.getElementById('cs-'+cc.id).value;comp[cc.id]={aplica:(s!=='No aplica'),s:s};});
   const data={nombre:document.getElementById('dep-nombre').value,tipo:document.getElementById('dep-tipo').value,area:document.getElementById('dep-area').value,edificio:document.getElementById('dep-edificio').value,obs:document.getElementById('dep-obs').value,implementador:document.getElementById('dep-implementador').value,tieneFocal:document.getElementById('dep-tiene-focal').checked,focal_n:document.getElementById('dep-fn').value,focal_c:document.getElementById('dep-fc').value,focal_e:document.getElementById('dep-fe').value,focal_t:document.getElementById('dep-ft').value,focal_b:document.getElementById('dep-fb').value,comp,upd:new Date().toISOString()};
   if(!data.nombre){alert('El nombre es obligatorio');return;}
   try{await window._set(window._doc(window._db,'dependencias',id),data);closeModal('modal-dep');await loadAll();renderAll();}catch(e){alert('Error: '+e.message);}
@@ -1655,7 +1748,7 @@ function openFichaEP(ep){
         <div><strong>Designación:</strong> ${ep.dpd_f||'—'}</div>
       </div>`:'<div class="alert alert-danger">⚠️ Delegado de PDP no identificado</div>'}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        ${EP_COMP.map(cc=>{const co=ep.comp&&ep.comp[cc.id];if(!co||!co.aplica)return`<div style="padding:8px 12px;background:var(--gris-claro);border-radius:8px;font-size:11px;opacity:.5;display:flex;align-items:center;gap:6px">${cc.i} ${cc.n}</div>`;return`<div style="padding:8px 12px;background:white;border:1px solid var(--borde);border-radius:8px;font-size:11px;display:flex;align-items:center;gap:6px"><span>${cc.i}</span><span style="flex:1">${cc.n}</span><span class="semaforo sem-${SC[co.s]||'gris'}"></span><span style="font-weight:600;font-size:10px">${co.s}</span></div>`;}).join('')}
+        ${EP_COMP.map(cc=>{const co=ep.comp&&ep.comp[cc.id];if(!aplicaC(co))return`<div style="padding:8px 12px;background:var(--gris-claro);border-radius:8px;font-size:11px;opacity:.5;display:flex;align-items:center;gap:6px">${cc.i} ${cc.n}</div>`;return`<div style="padding:8px 12px;background:white;border:1px solid var(--borde);border-radius:8px;font-size:11px;display:flex;align-items:center;gap:6px"><span>${cc.i}</span><span style="flex:1">${cc.n}</span><span class="semaforo sem-${SC[co.s]||'gris'}"></span><span style="font-weight:600;font-size:10px">${co.s}</span></div>`;}).join('')}
       </div>
     </div>
     <div class="modal-footer">
@@ -1688,10 +1781,10 @@ function openModalEP(id,nombrePre){
   impSel.innerHTML='<option value="">Sin asignar</option>'+implementadores.filter(i=>i.activo!==false).map(i=>`<option value="${i.id}" ${ep&&ep.implementador===i.id?'selected':''}>${i.nombre}</option>`).join('');
   document.getElementById('ep-comp-form').innerHTML=EP_COMP.map(cc=>{
     const co=ep&&ep.comp&&ep.comp[cc.id];
-    const aplica=co?co.aplica:true;const st=co?co.s||'Pendiente':'Pendiente';
+    const st=co?(co.aplica===false?'No aplica':(co.s||'Pendiente')):'Pendiente';
     return`<div style="padding:10px 12px;background:var(--gris-claro);border-radius:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <label class="toggle"><input type="checkbox" id="eca-${cc.id}" ${aplica?'checked':''}><span class="toggle-slider"></span></label>
+        <span class="semaforo sem-${SC[st]||'gris'}"></span>
         <span style="font-size:11px;font-weight:600">${cc.i} ${cc.n}</span>
       </div>
       <select class="select-status" id="ecs-${cc.id}">${STATUS.map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>
@@ -1707,7 +1800,7 @@ window.toggleDPD=toggleDPD;
 async function saveEP(){
   const id=document.getElementById('ep-id').value||uid();
   const comp={};
-  EP_COMP.forEach(cc=>{comp[cc.id]={aplica:document.getElementById('eca-'+cc.id).checked,s:document.getElementById('ecs-'+cc.id).value};});
+  EP_COMP.forEach(cc=>{const s=document.getElementById('ecs-'+cc.id).value;comp[cc.id]={aplica:(s!=='No aplica'),s:s};});
   const data={nombre:document.getElementById('ep-nombre').value,siglas:document.getElementById('ep-siglas').value,ruc:document.getElementById('ep-ruc').value,tipo:document.getElementById('ep-tipo').value,coord:document.getElementById('ep-coord').value,obs:document.getElementById('ep-obs').value,implementador:document.getElementById('ep-imp').value,tieneDPD:document.getElementById('ep-tiene-dpd').checked,dpd_n:document.getElementById('ep-dn').value,dpd_c:document.getElementById('ep-dc').value,dpd_e:document.getElementById('ep-de').value,dpd_t:document.getElementById('ep-dt').value,dpd_f:document.getElementById('ep-df').value,comp,upd:new Date().toISOString()};
   if(!data.nombre){alert('El nombre es obligatorio');return;}
   try{await window._set(window._doc(window._db,'empresas_publicas',id),data);closeModal('modal-ep');await loadAll();renderAll();}catch(e){alert('Error: '+e.message);}
@@ -1814,7 +1907,10 @@ function renderReuniones(){
       <div style="font-size:12px;font-weight:700;color:var(--azul);margin-bottom:4px">📋 Temas tratados:</div>
       <div style="font-size:13px;white-space:pre-line">${r.temas||'—'}</div>
       ${r.acuerdos?`<div style="font-size:12px;font-weight:700;color:var(--verde);margin:8px 0 4px">✅ Acuerdos:</div><div style="font-size:13px;white-space:pre-line">${r.acuerdos}</div>`:''}
-      ${r.proxima?`<div style="margin-top:8px"><span class="badge badge-naranja">📅 Próxima reunión: ${r.proxima}</span></div>`:''}
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        ${r.proxima?`<span class="badge badge-naranja">📅 Próxima reunión: ${r.proxima}</span>`:''}
+        ${r.acta_url?`<a href="${r.acta_url}" target="_blank" class="badge badge-azul" style="text-decoration:none;cursor:pointer">${(r.acta_tipo||'').includes('pdf')?'📄':'🖼️'} Ver acta</a>`:'<span class="badge badge-gris">Sin acta adjunta</span>'}
+      </div>
     </div>
   </div>`).join('');
 }
@@ -1843,9 +1939,41 @@ function openModalReu(id){
   const respSel=document.getElementById('reu-responsable');
   respSel.innerHTML='<option value="">Sin asignar</option>'+implementadores.map(i=>`<option value="${i.nombre}" ${r&&r.responsable===i.nombre?'selected':''}>${i.nombre}</option>`).join('');
 
+  // Acta de reunión
+  reuActaNueva=null;reuActaEliminar=false;
+  reuActaActual=(r&&r.acta_url)?{url:r.acta_url,nombre:r.acta_nombre||'acta',tipo:r.acta_tipo||'',path:r.acta_path||''}:null;
+  document.getElementById('reu-acta-file').value='';
+  document.getElementById('reu-acta-progress').style.display='none';
+  renderActaActual();
+
   document.getElementById('modal-reu').classList.add('open');
 }
 window.openModalReu=openModalReu;
+
+// ===== Acta de reunión (Firebase Storage) =====
+let reuActaNueva=null, reuActaActual=null, reuActaEliminar=false;
+function renderActaActual(){
+  const box=document.getElementById('reu-acta-actual');
+  if(reuActaNueva){
+    box.style.display='flex';
+    box.innerHTML=`<span style="font-size:18px">📎</span><span style="flex:1">Nuevo archivo: <strong>${reuActaNueva.name}</strong> (${(reuActaNueva.size/1048576).toFixed(2)} MB)</span><button type="button" class="btn btn-sm btn-secondary" onclick="cancelarActaNueva()">Quitar</button>`;
+  }else if(reuActaActual&&!reuActaEliminar){
+    const ico=(reuActaActual.tipo||'').includes('pdf')?'📄':'🖼️';
+    box.style.display='flex';
+    box.innerHTML=`<span style="font-size:18px">${ico}</span><span style="flex:1">Acta actual: <a href="${reuActaActual.url}" target="_blank" style="color:var(--azul-medio);font-weight:600">${reuActaActual.nombre}</a></span><button type="button" class="btn btn-sm btn-danger" onclick="marcarEliminarActa()">🗑️ Eliminar</button>`;
+  }else{
+    box.style.display='none';box.innerHTML='';
+  }
+}
+function onActaSelect(){
+  const f=document.getElementById('reu-acta-file').files[0];
+  if(!f){reuActaNueva=null;renderActaActual();return;}
+  if(f.size>10*1048576){alert('El archivo supera los 10 MB. Usa una imagen o PDF más liviano.');document.getElementById('reu-acta-file').value='';return;}
+  reuActaNueva=f;reuActaEliminar=false;renderActaActual();
+}
+function cancelarActaNueva(){reuActaNueva=null;document.getElementById('reu-acta-file').value='';renderActaActual();}
+function marcarEliminarActa(){if(!confirm('¿Quitar el acta adjunta de esta reunión?'))return;reuActaEliminar=true;renderActaActual();}
+window.onActaSelect=onActaSelect;window.cancelarActaNueva=cancelarActaNueva;window.marcarEliminarActa=marcarEliminarActa;
 
 async function saveReu(){
   const id=document.getElementById('reu-id').value||uid();
@@ -1853,11 +1981,73 @@ async function saveReu(){
   const imps=Array.from(impsEl.selectedOptions).map(o=>o.value);
   const data={fecha:document.getElementById('reu-fecha').value,hora:document.getElementById('reu-hora').value,tipo:document.getElementById('reu-tipo').value,modal:document.getElementById('reu-modal').value,lugar:document.getElementById('reu-lugar').value,dep:document.getElementById('reu-dep').value,ep:document.getElementById('reu-ep').value,otras_deps:document.getElementById('reu-otras-deps').value,otros:document.getElementById('reu-otros').value,imps,temas:document.getElementById('reu-temas').value,acuerdos:document.getElementById('reu-acuerdos').value,proxima:document.getElementById('reu-proxima').value,responsable:document.getElementById('reu-responsable').value,upd:new Date().toISOString()};
   if(!data.fecha||!data.temas){alert('Fecha y temas son obligatorios');return;}
-  try{await window._set(window._doc(window._db,'reuniones',id),data);closeModal('modal-reu');await loadAll();renderReuniones();}catch(e){alert('Error: '+e.message);}
+  // Acta: conservar la existente por defecto
+  if(reuActaActual&&!reuActaEliminar){data.acta_url=reuActaActual.url;data.acta_nombre=reuActaActual.nombre;data.acta_tipo=reuActaActual.tipo;data.acta_path=reuActaActual.path;}
+  try{
+    // Subir acta nueva si la hay
+    if(reuActaNueva){
+      document.getElementById('reu-acta-progress').style.display='block';
+      const safe=reuActaNueva.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const path=`actas/${id}/${Date.now()}_${safe}`;
+      const refA=window._sRef(window._storage,path);
+      await window._uploadBytes(refA,reuActaNueva,{contentType:reuActaNueva.type});
+      const url=await window._getDownloadURL(refA);
+      // borrar acta anterior si se reemplaza
+      if(reuActaActual&&reuActaActual.path){try{await window._deleteObject(window._sRef(window._storage,reuActaActual.path));}catch(e){}}
+      data.acta_url=url;data.acta_nombre=reuActaNueva.name;data.acta_tipo=reuActaNueva.type;data.acta_path=path;
+    }else if(reuActaEliminar){
+      // eliminar acta existente
+      if(reuActaActual&&reuActaActual.path){try{await window._deleteObject(window._sRef(window._storage,reuActaActual.path));}catch(e){}}
+      data.acta_url='';data.acta_nombre='';data.acta_tipo='';data.acta_path='';
+    }
+    await window._set(window._doc(window._db,'reuniones',id),data);
+    closeModal('modal-reu');await loadAll();renderReuniones();
+  }catch(e){
+    document.getElementById('reu-acta-progress').style.display='none';
+    alert('Error al guardar la reunión o subir el acta: '+e.message+'\n\nSi el problema es de permisos, revisa las reglas de Firebase Storage.');
+  }
 }
 window.saveReu=saveReu;
-async function deleteReu(id){if(!confirm('¿Eliminar reunión?'))return;await window._del(window._doc(window._db,'reuniones',id));await loadAll();renderReuniones();}
+async function deleteReu(id){if(!confirm('¿Eliminar reunión?'))return;const r=reuniones.find(x=>x.id===id);if(r&&r.acta_path){try{await window._deleteObject(window._sRef(window._storage,r.acta_path));}catch(e){}}await window._del(window._doc(window._db,'reuniones',id));await loadAll();renderReuniones();}
 window.deleteReu=deleteReu;
+
+// ======== INSTITUCIONAL (MDMQ / Administración General) ========
+function instPct(){const c=institucional.comp||{};const ok=INST_COMP.filter(x=>c[x.id]&&c[x.id].s==='Completado').length;return INST_COMP.length?Math.round(ok/INST_COMP.length*100):0;}
+function renderInstitucional(){
+  const c=institucional.comp||{};const p=instPct();
+  const ok=INST_COMP.filter(x=>c[x.id]&&c[x.id].s==='Completado').length;
+  const en=INST_COMP.filter(x=>c[x.id]&&c[x.id].s==='En proceso').length;
+  const cont=document.getElementById('inst-content');if(!cont)return;
+  cont.innerHTML=`
+    <div class="card" style="padding:20px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:12px">
+        <div><div style="font-size:12px;color:var(--gris)">Avance institucional</div><div style="font-size:30px;font-weight:700;color:${pColor(p)}">${p}%</div><div style="font-size:11px;color:var(--gris)">${ok} completados · ${en} en proceso · de ${INST_COMP.length} componentes</div></div>
+        <div style="font-size:12px;color:var(--gris);max-width:440px;line-height:1.5">Estos componentes los cumple el MDMQ una sola vez (Administración General / DPD) y <strong>no</strong> se evalúan por dependencia.</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${p}%;background:${pColor(p)}"></div></div>
+    </div>
+    ${INST_COMP.map(cc=>{const o=c[cc.id]||{};const s=o.s||'Pendiente';return `
+      <div class="card" style="padding:16px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span style="font-size:20px">${cc.i}</span>
+          <div style="flex:1;min-width:220px"><div style="font-weight:700;font-size:14px">${cc.n}</div><div style="font-size:11px;color:var(--gris)">${INST_NORM[cc.id]||''}</div></div>
+          <span class="semaforo sem-${SC[s]||'gris'}"></span>
+          <select onchange="saveInst('${cc.id}','s',this.value)" style="padding:8px 10px;border:2px solid var(--borde);border-radius:8px;font-family:inherit;font-size:13px">${['Pendiente','En proceso','Completado'].map(st=>`<option ${s===st?'selected':''}>${st}</option>`).join('')}</select>
+        </div>
+        <div style="font-size:12px;color:var(--gris);margin-top:8px">📌 ${INST_ACC[cc.id]||''}</div>
+        <div class="form-row form-row-2" style="margin-top:10px">
+          <div class="field"><label>Responsable</label><input type="text" value="${(o.resp||'').replace(/"/g,'&quot;')}" onchange="saveInst('${cc.id}','resp',this.value)" placeholder="Responsable / unidad"></div>
+          <div class="field"><label>Observación / evidencia</label><input type="text" value="${(o.obs||'').replace(/"/g,'&quot;')}" onchange="saveInst('${cc.id}','obs',this.value)" placeholder="Nota, enlace o referencia"></div>
+        </div>
+      </div>`;}).join('')}`;
+}
+async function saveInst(id,field,val){
+  if(!institucional.comp)institucional.comp={};
+  if(!institucional.comp[id])institucional.comp[id]={};
+  institucional.comp[id][field]=val;institucional.upd=new Date().toISOString();
+  try{await window._set(window._doc(window._db,'institucional','mdmq'),{comp:institucional.comp,upd:institucional.upd});if(field==='s'){renderInstitucional();renderDashboard();}}catch(e){alert('Error al guardar: '+e.message);}
+}
+window.saveInst=saveInst;
 
 // ======== SISTEMAS ========
 function renderSis(){
@@ -1985,7 +2175,7 @@ function renderGAP(){
   const pct=calcPct(d);
   let items=COMPONENTES.map(cc=>{
     const co=d.comp&&d.comp[cc.id];
-    const aplica=co?co.aplica:true;
+    const aplica=co?aplicaC(co):true;
     const st=co?co.s:'Pendiente';
     return{...cc,aplica,st};
   });
@@ -2025,7 +2215,7 @@ function exportGAP(){
   const d=deps.find(x=>x.id===depId);if(!d){alert('Selecciona una dependencia');return;}
   const rows=COMPONENTES.map(cc=>{
     const co=d.comp&&d.comp[cc.id];
-    return[d.nombre,cc.n,co?co.s||'Pendiente':'Pendiente',co?co.aplica?'Sí':'No aplica':'Sí',GAP_NORM[cc.id]||'',GAP_ACC[cc.id]||''];
+    return[d.nombre,cc.n,co?co.s||'Pendiente':'Pendiente',co?(aplicaC(co)?'Sí':'No aplica'):'Sí',GAP_NORM[cc.id]||'',GAP_ACC[cc.id]||''];
   });
   downloadCSV(toCSV(['Dependencia','Componente','Estado','Aplica','Base Legal','Acción Recomendada'],rows),`GAP_${d.nombre.substr(0,20)}.csv`);
 }
@@ -2090,7 +2280,7 @@ function renderEntrevista(){
         ${pregunta('ent-s3','¿Los sistemas generan logs/registros de acceso?','radio',['Sí','No','No lo sé'])}
       </div></div>
 
-      <div class="card" style="margin-bottom:16px"><div class="card-header"><h4>6️⃣ Estado de los 16 Componentes SIPD</h4></div><div class="card-body">
+      <div class="card" style="margin-bottom:16px"><div class="card-header"><h4>6️⃣ Estado de los 15 Componentes SIPD</h4></div><div class="card-body">
         <p style="font-size:13px;color:var(--gris);margin-bottom:16px">Para cada componente, indica el estado actual en la dependencia:</p>
         ${COMPONENTES.map(cc=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--gris-claro);border-radius:10px;margin-bottom:8px;flex-wrap:wrap;gap:8px">
           <span style="font-size:13px;font-weight:600">${cc.i} ${cc.n}</span>
@@ -2157,13 +2347,17 @@ function renderReportes(){
   const pcts=deps.map(d=>calcPct(d)).filter(p=>p>=0);
   const avg=pcts.length?Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length):0;
   document.getElementById('rep-general').innerHTML=`
+    <div class="card" style="padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="font-size:13px;color:var(--gris)">📑 Descarga el reporte consolidado del SIPD en un solo libro de Excel (5 hojas).</div>
+      <button class="btn btn-sm btn-primary" onclick="expTodoX()">📊 Exportar TODO a Excel</button>
+    </div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">
       ${[['Dependencias',tDep,'🏛️'],['Emp. Públicas',tEP,'🏢'],['Sistemas',tSis,'💻'],['Reuniones',tReu,'📅'],['Avance Prom.',avg+'%','📊']].map(([l,v,i])=>`<div class="card" style="padding:16px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--azul)">${v}</div><div style="font-size:11px;color:var(--gris)">${i} ${l}</div></div>`).join('')}
     </div>
-    <div class="card"><div class="card-header"><h4>📊 Estado por Componente SIPD</h4><button class="btn btn-sm btn-secondary" onclick="expRepGen()">📥 CSV</button></div>
+    <div class="card"><div class="card-header"><h4>📊 Estado por Componente SIPD</h4><div style="display:flex;gap:6px"><button class="btn btn-sm btn-primary" onclick="expRepGenX()">📊 Excel</button><button class="btn btn-sm btn-secondary" onclick="expRepGen()">📥 CSV</button></div></div>
     <div class="card-body table-wrap"><table><thead><tr><th>Componente</th><th>Aplica a</th><th>Completado</th><th>En proceso</th><th>Pendiente</th><th>Avance</th><th>Progreso</th></tr></thead>
     <tbody>${COMPONENTES.map(cc=>{
-      const ap=deps.filter(d=>d.comp&&d.comp[cc.id]&&d.comp[cc.id].aplica);
+      const ap=deps.filter(d=>aplicaC(d.comp&&d.comp[cc.id]));
       const ok=ap.filter(d=>d.comp[cc.id].s==='Completado').length;
       const en=ap.filter(d=>d.comp[cc.id].s==='En proceso').length;
       const pe=ap.filter(d=>d.comp[cc.id].s==='Pendiente').length;
@@ -2172,15 +2366,15 @@ function renderReportes(){
     }).join('')}</tbody></table></div></div>`;
 
   // Dependencias
-  document.getElementById('rep-deps').innerHTML=`<div class="card"><div class="card-header"><h4>🏛️ Avance por Dependencia</h4><button class="btn btn-sm btn-secondary" onclick="expRepDep()">📥 CSV</button></div>
+  document.getElementById('rep-deps').innerHTML=`<div class="card"><div class="card-header"><h4>🏛️ Avance por Dependencia</h4><div style="display:flex;gap:6px"><button class="btn btn-sm btn-primary" onclick="expRepDepX()">📊 Excel</button><button class="btn btn-sm btn-secondary" onclick="expRepDep()">📥 CSV</button></div></div>
   <div class="card-body table-wrap"><table><thead><tr><th>Dependencia</th><th>Tipo</th><th>Implementador</th><th>Punto Focal</th><th>Correo</th><th>Comp. Aplica</th><th>Completados</th><th>Avance</th></tr></thead>
-  <tbody>${deps.map(d=>{const p=calcPct(d);const ap=COMPONENTES.filter(c=>d.comp&&d.comp[c.id]&&d.comp[c.id].aplica).length;const ok=COMPONENTES.filter(c=>d.comp&&d.comp[c.id]&&d.comp[c.id].s==='Completado').length;const imp=getImp(d.implementador);return`<tr><td><strong>${d.nombre}</strong></td><td style="font-size:11px">${d.tipo||''}</td><td>${imp?`<span style="font-weight:600;color:${imp.color||'var(--azul)'}">${imp.nombre}</span>`:'—'}</td><td>${d.tieneFocal?d.focal_n||'—':'<span class="badge badge-rojo">Sin focal</span>'}</td><td style="font-size:11px">${d.focal_e||'—'}</td><td style="text-align:center">${ap}</td><td style="text-align:center">${ok}</td><td><strong style="color:${p<0?'var(--gris)':pColor(p)}">${p<0?'N/A':p+'%'}</strong></td></tr>`}).join('')}</tbody></table></div></div>`;
+  <tbody>${deps.map(d=>{const p=calcPct(d);const ap=COMPONENTES.filter(c=>aplicaC(d.comp&&d.comp[c.id])).length;const ok=COMPONENTES.filter(c=>d.comp&&d.comp[c.id]&&d.comp[c.id].s==='Completado').length;const imp=getImp(d.implementador);return`<tr><td><strong>${d.nombre}</strong></td><td style="font-size:11px">${d.tipo||''}</td><td>${imp?`<span style="font-weight:600;color:${imp.color||'var(--azul)'}">${imp.nombre}</span>`:'—'}</td><td>${d.tieneFocal?d.focal_n||'—':'<span class="badge badge-rojo">Sin focal</span>'}</td><td style="font-size:11px">${d.focal_e||'—'}</td><td style="text-align:center">${ap}</td><td style="text-align:center">${ok}</td><td><strong style="color:${p<0?'var(--gris)':pColor(p)}">${p<0?'N/A':p+'%'}</strong></td></tr>`}).join('')}</tbody></table></div></div>`;
 
   // Sistemas
   document.getElementById('rep-sis').innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
     ${[['Total',sistemas.length,'💻','var(--azul)'],['Datos personales',sistemas.filter(s=>s.s_tdp==='Sí').length,'👥','var(--naranja)'],['Datos sensibles',sistemas.filter(s=>s.s_ds==='Sí').length,'⚠️','var(--rojo)'],['Alto riesgo',sistemas.filter(s=>s.s_c4==='Alto').length,'🔴','var(--rojo)']].map(([l,v,i,c])=>`<div class="card" style="padding:16px;text-align:center"><div style="font-size:26px;font-weight:700;color:${c}">${v}</div><div style="font-size:11px;color:var(--gris)">${i} ${l}</div></div>`).join('')}
   </div>
-  <div class="card"><div class="card-header"><h4>💻 Inventario Completo</h4><button class="btn btn-sm btn-secondary" onclick="expRepSis()">📥 CSV</button></div>
+  <div class="card"><div class="card-header"><h4>💻 Inventario Completo</h4><div style="display:flex;gap:6px"><button class="btn btn-sm btn-primary" onclick="expRepSisX()">📊 Excel</button><button class="btn btn-sm btn-secondary" onclick="expRepSis()">📥 CSV</button></div></div>
   <div class="card-body table-wrap"><table><thead><tr><th>Sistema</th><th>Secretaría</th><th>Tipo</th><th>Datos Pers.</th><th>Sensibles</th><th>País Datos</th><th>Proveedor</th><th>Contrato</th><th>EIPD</th><th>Riesgo</th></tr></thead>
   <tbody>${sistemas.map(s=>`<tr><td><strong style="font-size:12px">${s.s_nom||'—'}</strong></td><td style="font-size:11px">${s.s_c6||'—'}</td><td><span class="badge badge-azul" style="font-size:10px">${s.s_tipo||'—'}</span></td><td>${s.s_tdp==='Sí'?'<span class="badge badge-naranja" style="font-size:10px">Sí</span>':'—'}</td><td>${s.s_ds==='Sí'?'<span class="badge badge-rojo" style="font-size:10px">⚠️</span>':'—'}</td><td style="font-size:11px">${s.s_pais||'—'}</td><td style="font-size:11px">${s.s_pv2||'—'}</td><td><span class="badge badge-${s.s_pv4==='Vencido'?'rojo':s.s_pv4==='Sí'?'verde':'gris'}" style="font-size:10px">${s.s_pv4||'N/A'}</span></td><td><span class="badge badge-${s.s_c2==='Completada'?'verde':s.s_c1==='Sí'?'rojo':'gris'}" style="font-size:10px">${s.s_c2||'N/A'}</span></td><td><span class="badge badge-${s.s_c4==='Alto'?'rojo':s.s_c4==='Medio'?'naranja':'verde'}" style="font-size:10px">${s.s_c4||'—'}</span></td></tr>`).join('')}</tbody></table></div></div>`;
 
@@ -2194,7 +2388,7 @@ function renderReportes(){
   sistemas.filter(s=>s.s_sg3==='No'&&s.s_tdp==='Sí').forEach(s=>alertas.push(['🟡 Advertencia','Art. 10-j LOPDP',`Sin cifrado en tránsito: ${s.s_nom}`]));
   sistemas.filter(s=>s.s_pv5==='No'&&s.s_pv1==='Sí').forEach(s=>alertas.push(['🟡 Advertencia','Arts. 41-46 LOPDP',`Contrato sin cláusulas PDP: ${s.s_nom}`]));
   eps.filter(e=>!e.tieneDPD).forEach(e=>alertas.push(['🟡 Advertencia','Art. 45 LOPDP',`EP sin Delegado identificado: ${e.nombre}`]));
-  document.getElementById('rep-alertas').innerHTML=!alertas.length?'<div class="alert alert-success">✅ Sin alertas detectadas</div>':`<div class="card"><div class="card-header"><h4>⚠️ ${alertas.length} Alerta(s)</h4><button class="btn btn-sm btn-secondary" onclick="expAlerts()">📥 CSV</button></div>
+  document.getElementById('rep-alertas').innerHTML=!alertas.length?'<div class="alert alert-success">✅ Sin alertas detectadas</div>':`<div class="card"><div class="card-header"><h4>⚠️ ${alertas.length} Alerta(s)</h4><div style="display:flex;gap:6px"><button class="btn btn-sm btn-primary" onclick="expAlertsX()">📊 Excel</button><button class="btn btn-sm btn-secondary" onclick="expAlerts()">📥 CSV</button></div></div>
   <div class="card-body table-wrap"><table><thead><tr><th>Nivel</th><th>Base Legal</th><th>Descripción</th></tr></thead>
   <tbody>${alertas.map(a=>`<tr><td><span class="badge badge-${a[0].includes('🔴')?'rojo':'naranja'}">${a[0]}</span></td><td style="font-size:12px;font-weight:600">${a[1]}</td><td style="font-size:12px">${a[2]}</td></tr>`).join('')}</tbody></table></div></div>`;
 
@@ -2221,22 +2415,116 @@ function renderReportes(){
       </div>`;
     }).join('')}
   </div></div>`;
+
+  renderJerarquia();
 }
 
-// ======== EXPORTS ========
+// ======== ROLL-UP JERÁRQUICO (Secretaría → Dirección → Unidad) ========
+function normName(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\bdir\.?\b/g,'direccion').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
+function buildDepPctMap(){const m={};deps.forEach(d=>{m[normName(d.nombre)]={p:calcPct(d),d};});return m;}
+// Calcula el % de un nodo del organigrama: hoja = % de su dependencia; padre = promedio de los hijos con datos (+ su propio % si está registrado), igual que la matriz
+function rollupNode(node,map){
+  const own=map[normName(node.n)];const ownP=own?own.p:-1;
+  if(node.ch&&node.ch.length){
+    const kids=node.ch.map(c=>rollupNode(c,map));
+    const vals=kids.filter(k=>k.p>=0).map(k=>k.p);
+    if(ownP>=0)vals.push(ownP);
+    const p=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):-1;
+    return{n:node.n,l:node.l,p,ownP,kids,registrada:!!own};
+  }
+  return{n:node.n,l:node.l,p:ownP,ownP,kids:[],registrada:!!own};
+}
+function jerarquiaRows(n,out){
+  // saltamos el nodo raíz (Alcaldía, l:0) en el listado pero promediamos desde sus hijos
+  if(n.l>0)out.push(n);
+  n.kids.forEach(k=>jerarquiaRows(k,out));
+  return out;
+}
+function renderJerarquia(){
+  const cont=document.getElementById('rep-jerarquia');if(!cont)return;
+  const map=buildDepPctMap();
+  const tree=rollupNode(ORG,map);
+  // % global del MDMQ = promedio de las secretarías/nivel 1 con datos
+  const rows=[];tree.kids.forEach(k=>jerarquiaRows(k,rows));
+  const totReg=deps.length;
+  const enArbol=deps.filter(d=>rows.some(r=>normName(r.n)===normName(d.nombre))).length;
+  const indent={1:0,2:22,3:44};
+  const sizeFs={1:14,2:13,3:12};
+  const body=rows.map(r=>{
+    const p=r.p;const col=p<0?'var(--gris)':pColor(p);
+    const bg=r.l===1?'var(--azul-bg)':r.l===2?'#F8FAFC':'white';
+    const weight=r.l===1?700:r.l===2?600:500;
+    const pre=r.l===1?'🏛️ ':r.l===2?'📂 ':'• ';
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;margin-left:${indent[r.l]||0}px;background:${bg};border:1px solid var(--borde);border-radius:8px;margin-bottom:4px">
+      <span style="flex:1;font-size:${sizeFs[r.l]||12}px;font-weight:${weight}">${pre}${r.n}${(r.l<3&&r.registrada)?' <span style="font-size:10px;color:var(--gris)">(con diagnóstico propio)</span>':''}</span>
+      ${p<0?'<span class="badge badge-gris">Sin datos</span>':`<div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:${p}%;background:${col}"></div></div><strong style="color:${col};min-width:42px;text-align:right">${p}%</strong>`}
+    </div>`;
+  }).join('');
+  cont.innerHTML=`
+    <div class="card" style="padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="font-size:13px;color:var(--gris);max-width:560px;line-height:1.5">Promedio jerárquico igual que la matriz: la <strong>Unidad</strong> toma el % de su diagnóstico, la <strong>Dirección</strong> promedia sus unidades y la <strong>Secretaría</strong> promedia sus direcciones. Un nodo aparece "Sin datos" si la dependencia no está registrada o su nombre no coincide con el organigrama.</div>
+      <button class="btn btn-sm btn-primary" onclick="expJerarquiaX()">📊 Excel</button>
+    </div>
+    <div class="card" style="padding:14px 18px;margin-bottom:14px;display:flex;gap:24px;flex-wrap:wrap">
+      <div><div style="font-size:11px;color:var(--gris)">% global MDMQ (prom. secretarías)</div><div style="font-size:24px;font-weight:700;color:${tree.p<0?'var(--gris)':pColor(tree.p)}">${tree.p<0?'N/A':tree.p+'%'}</div></div>
+      <div><div style="font-size:11px;color:var(--gris)">Dependencias en el organigrama</div><div style="font-size:24px;font-weight:700;color:var(--azul)">${enArbol} / ${totReg}</div></div>
+    </div>
+    <div class="card" style="padding:14px">${body||'<div class="empty-state"><div class="icon">🌳</div><h4>Sin estructura</h4></div>'}</div>`;
+}
+function dataJerarquia(){
+  const map=buildDepPctMap();const tree=rollupNode(ORG,map);const rows=[];tree.kids.forEach(k=>jerarquiaRows(k,rows));
+  const nivel={1:'Secretaría',2:'Dirección',3:'Unidad'};
+  return{name:'Jerarquía',headers:['Nivel','Dependencia','% Avance'],rows:rows.map(r=>[nivel[r.l]||r.l,(r.l===2?'   ':r.l===3?'      ':'')+r.n,r.p<0?'N/A':r.p+'%'])};
+}
+function expJerarquiaX(){downloadXLSX(`SIPD_jerarquia_${_hoy()}.xlsx`,[dataJerarquia()]);}
+window.expJerarquiaX=expJerarquiaX;
 function toCSV(headers,rows){return[headers.join(','),...rows.map(r=>r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');}
 function downloadCSV(csv,fn){const b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;a.click();}
-function expRepGen(){const rows=COMPONENTES.map(cc=>{const ap=deps.filter(d=>d.comp&&d.comp[cc.id]&&d.comp[cc.id].aplica);return[cc.n,ap.length,ap.filter(d=>d.comp[cc.id].s==='Completado').length,ap.filter(d=>d.comp[cc.id].s==='En proceso').length,ap.filter(d=>d.comp[cc.id].s==='Pendiente').length];});downloadCSV(toCSV(['Componente','Aplica a','Completado','En proceso','Pendiente'],rows),'SIPD_estado_general.csv');}
-function expRepDep(){const rows=deps.map(d=>{const p=calcPct(d);const imp=getImp(d.implementador);const ap=COMPONENTES.filter(c=>d.comp&&d.comp[c.id]&&d.comp[c.id].aplica).length;const ok=COMPONENTES.filter(c=>d.comp&&d.comp[c.id]&&d.comp[c.id].s==='Completado').length;return[d.nombre,d.tipo||'',imp?imp.nombre:'',d.tieneFocal?'Sí':'No',d.focal_n||'',d.focal_e||'',d.focal_t||'',ap,ok,p<0?'N/A':p+'%'];});downloadCSV(toCSV(['Dependencia','Tipo','Implementador','Tiene Focal','Nombre Focal','Correo','Teléfono','Comp. Aplica','Completados','Avance'],rows),'SIPD_dependencias.csv');}
+function expRepGen(){const rows=COMPONENTES.map(cc=>{const ap=deps.filter(d=>aplicaC(d.comp&&d.comp[cc.id]));return[cc.n,ap.length,ap.filter(d=>d.comp[cc.id].s==='Completado').length,ap.filter(d=>d.comp[cc.id].s==='En proceso').length,ap.filter(d=>d.comp[cc.id].s==='Pendiente').length];});downloadCSV(toCSV(['Componente','Aplica a','Completado','En proceso','Pendiente'],rows),'SIPD_estado_general.csv');}
+function expRepDep(){const rows=deps.map(d=>{const p=calcPct(d);const imp=getImp(d.implementador);const ap=COMPONENTES.filter(c=>aplicaC(d.comp&&d.comp[c.id])).length;const ok=COMPONENTES.filter(c=>d.comp&&d.comp[c.id]&&d.comp[c.id].s==='Completado').length;return[d.nombre,d.tipo||'',imp?imp.nombre:'',d.tieneFocal?'Sí':'No',d.focal_n||'',d.focal_e||'',d.focal_t||'',ap,ok,p<0?'N/A':p+'%'];});downloadCSV(toCSV(['Dependencia','Tipo','Implementador','Tiene Focal','Nombre Focal','Correo','Teléfono','Comp. Aplica','Completados','Avance'],rows),'SIPD_dependencias.csv');}
 function expRepSis(){const rows=sistemas.map(s=>[s.s_nom,s.s_c6,s.s_tipo,s.s_rn,s.s_re,s.s_tdp,s.s_ds,s.s_c4,s.s_pais,s.s_pv2,s.s_pv4,s.s_c1,s.s_c2,s.s_sg3,s.s_prueba].map(v=>v||''));downloadCSV(toCSV(['Sistema','Secretaría','Tipo','Responsable','Correo','Datos Personales','Datos Sensibles','Riesgo','País Datos','Proveedor','Estado Contrato','Requiere EIPD','Estado EIPD','Cifrado Tránsito','Datos en Pruebas'],rows),'SIPD_sistemas.csv');}
 function expAlerts(){const rows=[];deps.filter(d=>!d.tieneFocal).forEach(d=>rows.push(['Crítico','—',`Sin Focal: ${d.nombre}`]));sistemas.filter(s=>s.s_pv4==='Vencido').forEach(s=>rows.push(['Crítico','Art.43','Contrato vencido: '+s.s_nom]));sistemas.filter(s=>s.s_pais&&s.s_pais.toLowerCase()!=='ecuador'&&s.s_pais!=='').forEach(s=>rows.push(['Crítico','Art.47','Datos fuera Ecuador: '+s.s_nom]));downloadCSV(toCSV(['Nivel','Base Legal','Descripción'],rows),'SIPD_alertas.csv');}
 window.expRepGen=expRepGen;window.expRepDep=expRepDep;window.expRepSis=expRepSis;window.expAlerts=expAlerts;
 window.exportEntrevista=function(){alert('Usa el botón Imprimir o Ctrl+P para exportar el formulario');};
 
+// ======== EXPORTS EXCEL (SheetJS) ========
+function downloadXLSX(filename,sheets){
+  if(typeof XLSX==='undefined'){alert('No se pudo cargar la librería de Excel. Verifica tu conexión a internet.');return;}
+  const wb=XLSX.utils.book_new();
+  sheets.forEach(sh=>{
+    const aoa=[sh.headers,...sh.rows.map(r=>r.map(c=>c==null?'':c))];
+    const ws=XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols']=sh.headers.map((h,i)=>{const max=Math.max(String(h).length,...sh.rows.map(r=>String(r[i]==null?'':r[i]).length));return{wch:Math.min(Math.max(max+2,10),50)};});
+    XLSX.utils.book_append_sheet(wb,ws,sh.name.substring(0,31));
+  });
+  XLSX.writeFile(wb,filename);
+}
+function dataEstadoComp(){return{name:'Estado por Componente',headers:['Componente','Aplica a','Completado','En proceso','Pendiente','% Avance'],rows:COMPONENTES.map(cc=>{const ap=deps.filter(d=>aplicaC(d.comp&&d.comp[cc.id]));const ok=ap.filter(d=>d.comp[cc.id].s==='Completado').length;const en=ap.filter(d=>d.comp[cc.id].s==='En proceso').length;const pe=ap.filter(d=>d.comp[cc.id].s==='Pendiente').length;return[cc.n,ap.length,ok,en,pe,(ap.length?Math.round(ok/ap.length*100):0)+'%'];})};}
+function dataDeps(){return{name:'Dependencias',headers:['Dependencia','Tipo','Implementador','Tiene Focal','Nombre Focal','Correo','Teléfono','Comp. Aplica','Completados','Avance'],rows:deps.map(d=>{const p=calcPct(d);const imp=getImp(d.implementador);const ap=COMPONENTES.filter(c=>aplicaC(d.comp&&d.comp[c.id])).length;const ok=COMPONENTES.filter(c=>d.comp&&d.comp[c.id]&&d.comp[c.id].s==='Completado').length;return[d.nombre,d.tipo||'',imp?imp.nombre:'',d.tieneFocal?'Sí':'No',d.focal_n||'',d.focal_e||'',d.focal_t||'',ap,ok,p<0?'N/A':p+'%'];})};}
+function dataSis(){return{name:'Sistemas',headers:['Sistema','Secretaría','Tipo','Responsable','Correo','Datos Personales','Datos Sensibles','Riesgo','País Datos','Proveedor','Estado Contrato','Requiere EIPD','Estado EIPD','Cifrado Tránsito','Datos en Pruebas'],rows:sistemas.map(s=>[s.s_nom,s.s_c6,s.s_tipo,s.s_rn,s.s_re,s.s_tdp,s.s_ds,s.s_c4,s.s_pais,s.s_pv2,s.s_pv4,s.s_c1,s.s_c2,s.s_sg3,s.s_prueba].map(v=>v||''))};}
+function dataReu(){return{name:'Reuniones',headers:['Fecha','Hora','Tipo','Modalidad','Lugar/Enlace','Dependencia','Empresa Pública','Implementadores','Temas','Acuerdos','Próxima','Responsable','Acta adjunta'],rows:[...reuniones].sort((a,b)=>b.fecha>a.fecha?1:-1).map(r=>[r.fecha||'',r.hora||'',r.tipo||'',r.modal||'',r.lugar||'',r.dep||'',r.ep||'',(r.imps||[]).join(', '),r.temas||'',r.acuerdos||'',r.proxima||'',r.responsable||'',r.acta_url?'Sí — '+(r.acta_nombre||''):'No'])};}
+function dataAlertas(){const rows=[];deps.filter(d=>!d.tieneFocal).forEach(d=>rows.push(['Crítico','—','Sin Punto Focal: '+d.nombre]));sistemas.filter(s=>s.s_pv4==='Vencido').forEach(s=>rows.push(['Crítico','Art. 43 LOPDP','Contrato proveedor vencido: '+s.s_nom]));sistemas.filter(s=>s.s_pais&&s.s_pais.toLowerCase()!=='ecuador'&&s.s_pais!=='').forEach(s=>rows.push(['Crítico','Art. 47 LOPDP',`Datos fuera del Ecuador (${s.s_pais}): ${s.s_nom}`]));sistemas.filter(s=>s.s_prueba==='Sí').forEach(s=>rows.push(['Crítico','Art. 10-j LOPDP','Datos reales en pruebas: '+s.s_nom]));sistemas.filter(s=>s.s_c1==='Sí'&&s.s_c2!=='Completada').forEach(s=>rows.push(['Advertencia','Art. 34 LOPDP',`EIPD requerida y ${s.s_c2||'pendiente'}: ${s.s_nom}`]));return{name:'Alertas',headers:['Nivel','Base Legal','Descripción'],rows};}
+const _hoy=()=>new Date().toISOString().split('T')[0];
+function expRepGenX(){downloadXLSX(`SIPD_estado_general_${_hoy()}.xlsx`,[dataEstadoComp()]);}
+function expRepDepX(){downloadXLSX(`SIPD_dependencias_${_hoy()}.xlsx`,[dataDeps()]);}
+function expRepSisX(){downloadXLSX(`SIPD_sistemas_${_hoy()}.xlsx`,[dataSis()]);}
+function expReuX(){downloadXLSX(`SIPD_reuniones_${_hoy()}.xlsx`,[dataReu()]);}
+function expAlertsX(){downloadXLSX(`SIPD_alertas_${_hoy()}.xlsx`,[dataAlertas()]);}
+function expTodoX(){downloadXLSX(`SIPD_reporte_completo_${_hoy()}.xlsx`,[dataEstadoComp(),dataDeps(),dataJerarquia(),dataSis(),dataReu(),dataAlertas()]);}
+window.expRepGenX=expRepGenX;window.expRepDepX=expRepDepX;window.expRepSisX=expRepSisX;window.expReuX=expReuX;window.expAlertsX=expAlertsX;window.expTodoX=expTodoX;
+
 // ======== MODALS ========
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 window.closeModal=closeModal;
-document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+// Modales que NO deben cerrarse al hacer clic fuera (tienen formularios con datos)
+const MODALES_PROTEGIDOS = ['modal-reu','modal-sis','modal-tarea','modal-imp','modal-dep','modal-ep','modal-reporte-tareas'];
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', function(e) {
+    if(e.target !== this) return;                          // clic dentro del modal → ignorar
+    if(MODALES_PROTEGIDOS.includes(this.id)) return;      // modal protegido → no cerrar
+    this.classList.remove('open');                         // otros overlays → cerrar normalmente
+  });
+});
 
 // ======== MÓDULO TAREAS ========
 function switchVistaTareas(v){
@@ -3144,7 +3432,7 @@ async function importarSistemasExcel(input){
 window.importarSistemasExcel = importarSistemasExcel;
 
 // ======== RENDER ALL ========
-function renderAll(){renderDashboard();renderOrg();renderDeps();renderEPs();renderSis();renderReuniones();renderTareas();renderReportes();}
+function renderAll(){renderDashboard();renderOrg();renderDeps();renderEPs();renderSis();renderReuniones();renderTareas();renderReportes();renderInstitucional();}
 
 </script>
 </body>
